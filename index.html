@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>パートナー様専用 営業サポートAI | 幹開発株式会社</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #2E9FD8;        /* メインのスカイブルー */
+    --aqua: #35C4B5;       /* アクセントのアクア */
+    --deep: #0F3A4D;       /* 文字色(深い青緑) */
+    --mist: #EAF6FC;       /* 淡い空色の背景 */
+    --white: #FFFFFF;
+    --line: #D3E9F4;
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Noto Sans JP", sans-serif;
+    color: var(--deep);
+    background: linear-gradient(165deg, #F4FBFF 0%, var(--mist) 55%, #E3F7F3 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, .brand { font-family: "Zen Maru Gothic", sans-serif; }
+
+  /* ── ヘッダー(波モチーフ) ─────────────────── */
+  header {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff;
+    padding: 18px 20px 30px;
+    position: relative;
+  }
+  header .inner {
+    max-width: 860px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .brand { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.04em; }
+  .brand small { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.9; letter-spacing: 0.12em; margin-top: 2px; }
+  header .wave {
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 22px; width: 100%; display: block;
+  }
+  #logout-btn {
+    display: none;
+    background: rgba(255,255,255,0.22); color: #fff;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 999px; padding: 7px 16px;
+    font-size: 0.8rem; cursor: pointer; font-family: inherit;
+  }
+  #logout-btn:hover { background: rgba(255,255,255,0.35); }
+
+  main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 26px 16px 40px; }
+
+  /* ── ログインカード ─────────────────────── */
+  #login-view {
+    max-width: 430px; margin: 6vh auto 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 32px rgba(46,159,216,0.14);
+    padding: 34px 30px 30px;
+  }
+  #login-view h1 { font-size: 1.25rem; margin-bottom: 6px; }
+  #login-view .lead { font-size: 0.85rem; color: #4A6E80; margin-bottom: 22px; line-height: 1.7; }
+  label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; }
+  input[type="email"], input[type="text"] {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    font-size: 1rem; font-family: inherit; color: var(--deep);
+    background: #FBFEFF; outline: none;
+    transition: border-color .15s;
+  }
+  input:focus { border-color: var(--sky); }
+  .btn {
+    width: 100%; margin-top: 16px; padding: 13px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; font-size: 0.95rem; font-weight: 700; font-family: "Zen Maru Gothic", sans-serif;
+    letter-spacing: 0.06em; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(46,159,216,0.3);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(46,159,216,0.38); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn.ghost {
+    background: none; color: var(--sky);
+    box-shadow: none; border: 1.5px solid var(--line); margin-top: 10px;
+  }
+  .login-msg { margin-top: 14px; font-size: 0.83rem; line-height: 1.6; min-height: 1.2em; }
+  .login-msg.ok { color: #0E8A6C; }
+  .login-msg.err { color: #C7483B; }
+  #step-code { display: none; }
+  .code-note { font-size: 0.78rem; color: #4A6E80; margin-top: 8px; line-height: 1.7; }
+
+  /* ── チャット画面 ───────────────────────── */
+  #chat-view { display: none; }
+  .notice {
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 16px; font-size: 0.78rem; color: #4A6E80; line-height: 1.8; margin-bottom: 16px;
+  }
+  .notice b { color: var(--deep); }
+  #messages {
+    background: var(--white);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 20px; height: 55vh; min-height: 320px;
+    overflow-y: auto;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .row { display: flex; }
+  .row.user { justify-content: flex-end; }
+  .bubble {
+    max-width: 82%; padding: 11px 15px; border-radius: 16px;
+    font-size: 0.92rem; line-height: 1.75; white-space: pre-wrap; word-break: break-word;
+  }
+  .row.user .bubble {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; border-bottom-right-radius: 5px;
+  }
+  .row.ai .bubble {
+    background: var(--mist); color: var(--deep); border-bottom-left-radius: 5px;
+  }
+  .row.ai .bubble.error { background: #FDEDEB; color: #A03A2F; }
+  .row.ai .bubble.loading { color: #4A6E80; }
+  .bubble a { color: var(--sky); }
+  #input-bar { display: flex; gap: 10px; margin-top: 14px; }
+  #chat-input {
+    flex: 1; padding: 13px 16px;
+    border: 1.5px solid var(--line); border-radius: 999px;
+    font-size: 0.95rem; font-family: inherit; background: var(--white); outline: none;
+  }
+  #chat-input:focus { border-color: var(--sky); }
+  #send-btn {
+    padding: 0 26px; border: none; border-radius: 999px;
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; font-weight: 700; font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 0.92rem; cursor: pointer;
+    box-shadow: 0 5px 14px rgba(46,159,216,0.3);
+  }
+  #send-btn:disabled { opacity: 0.55; cursor: default; }
+
+  footer {
+    text-align: center; font-size: 0.72rem; color: #6E93A5; padding: 18px 10px 26px;
+  }
+  @media (max-width: 520px) {
+    #messages { height: 58vh; }
+    .bubble { max-width: 90%; }
+    #login-view { padding: 28px 20px 24px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="brand">営業サポートAI<small>MKI ENGINEERING × PARTNER</small></div>
+    <button id="logout-btn">ログアウト</button>
+  </div>
+  <svg class="wave" viewBox="0 0 1200 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,12 C150,26 300,-2 450,10 C600,22 750,0 900,12 C1050,24 1150,6 1200,12 L1200,24 L0,24 Z"
+          fill="#F4FBFF"></path>
+  </svg>
+</header>
+
+<main>
+  <!-- ログイン -->
+  <div id="login-view">
+    <h1>パートナー様専用ページ</h1>
+    <p class="lead">ご登録のメールアドレスに認証コードをお送りします。製品の使い方・セールスポイント・見積のご相談にAIがお答えします。</p>
+
+    <div id="step-email">
+      <label for="email-input">メールアドレス</label>
+      <input type="email" id="email-input" placeholder="taro@example.co.jp" autocomplete="email">
+      <button class="btn" id="send-code-btn">認証コードを送信</button>
+    </div>
+
+    <div id="step-code">
+      <label for="code-input">認証コード(6桁)</label>
+      <input type="text" id="code-input" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+      <button class="btn" id="verify-btn">ログイン</button>
+      <button class="btn ghost" id="back-btn">メールアドレスをやり直す</button>
+      <p class="code-note">メールが届かない場合は迷惑メールフォルダをご確認ください。送信元: noreply@miki-kk.jp</p>
+    </div>
+
+    <p class="login-msg" id="login-msg"></p>
+  </div>
+
+  <!-- チャット -->
+  <div id="chat-view">
+    <div class="notice">
+      <b>ご利用にあたって</b><br>
+      ・お客様名などの個人情報は入力しないでください<br>
+      ・製品名を含めてご質問いただくと、より正確にお答えできます<br>
+      ・正式なお見積りは sales@miki-kk.jp へメールでご依頼ください
+    </div>
+    <div id="messages"></div>
+    <div id="input-bar">
+      <input type="text" id="chat-input" placeholder="例: Buddycomと接続するときの設定手順は?">
+      <button id="send-btn">送信</button>
+    </div>
+  </div>
+</main>
+
+<footer>© 幹開発株式会社 MKI Engineering Co., Ltd.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  // ── 設定 ─────────────────────────────────────
+  var SUPABASE_URL = "https://adatzeolzkjujtuxebrc.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_2Ghe-V3dLS7Ym06p71i33A_zFU8eJgz";
+  var FUNCTION_URL = SUPABASE_URL + "/functions/v1/dealer-chat";
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var chatHistory = [];   // ※ window.history と衝突しないよう chatHistory を使用
+  var pendingEmail = "";
+
+  function $(id) { return document.getElementById(id); }
+
+  // ── 画面切り替え ─────────────────────────────
+  function showChat() {
+    $("login-view").style.display = "none";
+    $("chat-view").style.display = "block";
+    $("logout-btn").style.display = "inline-block";
+    if ($("messages").childElementCount === 0) {
+      addBubble("ai", "こんにちは。製品の使い方・セールスポイント・見積のご相談など、お気軽にご質問ください。");
+    }
+  }
+  function showLogin() {
+    $("login-view").style.display = "block";
+    $("chat-view").style.display = "none";
+    $("logout-btn").style.display = "none";
+    $("step-email").style.display = "block";
+    $("step-code").style.display = "none";
+  }
+
+  // ── 起動時: セッションがあればチャットへ ───────
+  sb.auth.getSession().then(function (res) {
+    if (res.data && res.data.session) showChat();
+  });
+
+  // ── 認証コード送信 ───────────────────────────
+  $("send-code-btn").addEventListener("click", function () {
+    var email = $("email-input").value.trim().toLowerCase();
+    if (!email || email.indexOf("@") < 0) {
+      return showLoginMsg("メールアドレスを入力してください", "err");
+    }
+    setBusy("send-code-btn", true, "送信中…");
+    sb.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } })
+      .then(function (res) {
+        setBusy("send-code-btn", false, "認証コードを送信");
+        if (res.error) {
+          showLoginMsg("送信に失敗しました。時間を置いてお試しください。", "err");
+        } else {
+          pendingEmail = email;
+          $("step-email").style.display = "none";
+          $("step-code").style.display = "block";
+          showLoginMsg("認証コードをメールで送信しました。", "ok");
+          $("code-input").focus();
+        }
+      });
+  });
+
+  // ── コード検証 ───────────────────────────────
+  $("verify-btn").addEventListener("click", function () {
+    var code = $("code-input").value.trim();
+    if (code.length < 6) return showLoginMsg("6桁のコードを入力してください", "err");
+    setBusy("verify-btn", true, "確認中…");
+    sb.auth.verifyOtp({ email: pendingEmail, token: code, type: "email" })
+      .then(function (res) {
+        setBusy("verify-btn", false, "ログイン");
+        if (res.error) {
+          showLoginMsg("コードが正しくないか、有効期限が切れています。", "err");
+        } else {
+          showLoginMsg("", "");
+          showChat();
+        }
+      });
+  });
+
+  $("back-btn").addEventListener("click", function () {
+    $("step-code").style.display = "none";
+    $("step-email").style.display = "block";
+    showLoginMsg("", "");
+  });
+
+  $("logout-btn").addEventListener("click", function () {
+    sb.auth.signOut().then(function () {
+      chatHistory = [];
+      $("messages").innerHTML = "";
+      showLogin();
+    });
+  });
+
+  // ── チャット送信 ─────────────────────────────
+  function sendQuestion() {
+    var q = $("chat-input").value.trim();
+    if (!q) return;
+    $("chat-input").value = "";
+    addBubble("user", q);
+    var loadingRow = addBubble("ai", "考えています…", "loading");
+    $("send-btn").disabled = true;
+
+    sb.auth.getSession().then(function (res) {
+      var session = res.data && res.data.session;
+      if (!session) {
+        loadingRow.remove();
+        addBubble("ai", "セッションが切れました。再ログインしてください。", "error");
+        $("send-btn").disabled = false;
+        showLogin();
+        return;
+      }
+      fetch(FUNCTION_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token,
+        },
+        body: JSON.stringify({ question: q, history: chatHistory }),
+      })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          loadingRow.remove();
+          if (data.answer) {
+            addBubble("ai", data.answer);
+            chatHistory.push({ role: "user", content: q });
+            chatHistory.push({ role: "assistant", content: data.answer });
+            if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+          } else {
+            addBubble("ai", data.error || "エラーが発生しました。", "error");
+          }
+        })
+        .catch(function () {
+          loadingRow.remove();
+          addBubble("ai", "通信エラーが発生しました。時間を置いてお試しください。", "error");
+        })
+        .finally(function () {
+          $("send-btn").disabled = false;
+          $("chat-input").focus();
+        });
+    });
+  }
+  $("send-btn").addEventListener("click", sendQuestion);
+  $("chat-input").addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.isComposing) sendQuestion();
+  });
+
+  // ── ユーティリティ ───────────────────────────
+  function addBubble(who, text, extraClass) {
+    var row = document.createElement("div");
+    row.className = "row " + who;
+    var b = document.createElement("div");
+    b.className = "bubble" + (extraClass ? " " + extraClass : "");
+    b.textContent = text;
+    row.appendChild(b);
+    $("messages").appendChild(row);
+    row.scrollIntoView({ block: "end" });
+    return row;
+  }
+  function showLoginMsg(text, type) {
+    var el = $("login-msg");
+    el.textContent = text;
+    el.className = "login-msg" + (type ? " " + type : "");
+  }
+  function setBusy(id, busy, label) {
+    var el = $(id);
+    el.disabled = busy;
+    el.textContent = label;
+  }
+</script>
+
+</body>
+</html>
