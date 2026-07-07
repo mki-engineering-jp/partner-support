@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow">
-<title>パートナー様専用 営業サポートAI | 幹開発株式会社</title>
+<title>パートナー様専用 営業サポートポータル | 幹開発株式会社</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -143,6 +143,130 @@
   }
   #send-btn:disabled { opacity: 0.55; cursor: default; }
 
+  /* ── タブナビゲーション ──────────────────── */
+  #portal-tabs {
+    display: none;
+    gap: 8px; margin-bottom: 18px;
+    background: var(--white);
+    border: 1px solid var(--line); border-radius: 999px;
+    padding: 6px;
+  }
+  .tab-btn {
+    flex: 1; padding: 10px 8px;
+    border: none; border-radius: 999px;
+    background: none; color: var(--deep);
+    font-size: 0.88rem; font-weight: 700; font-family: "Zen Maru Gothic", sans-serif;
+    letter-spacing: 0.04em; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .tab-btn.active {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(46,159,216,0.28);
+  }
+  .tab-btn:not(.active):hover { background: var(--mist); }
+
+  /* ── 製品ページ ─────────────────────────── */
+  #products-view { display: none; }
+  .prod-cat-title {
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 1rem; font-weight: 700;
+    margin: 22px 4px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .prod-cat-title::before {
+    content: ""; width: 6px; height: 20px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--sky), var(--aqua));
+  }
+  .prod-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;
+  }
+  .prod-card {
+    background: var(--white);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 16px 14px;
+    display: flex; flex-direction: column; gap: 6px;
+    transition: transform .12s, box-shadow .12s;
+  }
+  .prod-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(46,159,216,0.16); }
+  .prod-model {
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 1.05rem; font-weight: 700; color: var(--deep);
+  }
+  .prod-alias { font-size: 0.75rem; color: #4A6E80; }
+  .prod-desc { font-size: 0.82rem; line-height: 1.7; color: var(--deep); flex: 1; }
+  .prod-ask {
+    align-self: flex-start; margin-top: 6px;
+    border: 1.5px solid var(--line); border-radius: 999px;
+    background: none; color: var(--sky);
+    font-size: 0.76rem; font-weight: 700; font-family: inherit;
+    padding: 6px 14px; cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .prod-ask:hover { background: var(--sky); color: #fff; border-color: var(--sky); }
+
+  /* ── セールストーク ─────────────────────── */
+  #talks-view { display: none; }
+  .talk-cat-title {
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 1rem; font-weight: 700;
+    margin: 22px 4px 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .talk-cat-title::before {
+    content: ""; width: 6px; height: 20px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--aqua), var(--sky));
+  }
+  .talk-card {
+    background: var(--white);
+    border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 16px 18px; margin-bottom: 10px;
+  }
+  .talk-title { font-weight: 700; font-size: 0.9rem; margin-bottom: 6px; }
+  .talk-body { font-size: 0.85rem; line-height: 1.85; white-space: pre-wrap; word-break: break-word; color: var(--deep); }
+  .talk-status { text-align: center; font-size: 0.85rem; color: #4A6E80; padding: 30px 10px; }
+  .talk-status.err { color: #C7483B; }
+
+  /* ── よくある質問チップ ─────────────────── */
+  #quick-questions {
+    display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px;
+  }
+  .qq-btn {
+    border: 1.5px solid var(--line); border-radius: 999px;
+    background: var(--white); color: var(--deep);
+    font-size: 0.8rem; font-family: inherit;
+    padding: 8px 14px; cursor: pointer;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .qq-btn:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
+
+  /* ── 製品選択チップ ─────────────────────── */
+  #product-chips-wrap {
+    display: flex; align-items: center; gap: 8px;
+    margin-top: 12px;
+  }
+  .chip-label {
+    flex-shrink: 0; font-size: 0.75rem; font-weight: 700; color: #4A6E80;
+  }
+  #product-chips {
+    display: flex; gap: 6px; overflow-x: auto; padding: 2px;
+    -webkit-overflow-scrolling: touch;
+  }
+  #product-chips::-webkit-scrollbar { height: 4px; }
+  #product-chips::-webkit-scrollbar-thumb { background: var(--line); border-radius: 2px; }
+  .p-chip {
+    flex-shrink: 0;
+    border: 1.5px solid var(--line); border-radius: 999px;
+    background: var(--white); color: var(--deep);
+    font-size: 0.75rem; font-family: inherit; font-weight: 500;
+    padding: 6px 12px; cursor: pointer; white-space: nowrap;
+    transition: background .12s, color .12s, border-color .12s;
+  }
+  .p-chip.active {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    border-color: transparent; color: #fff; font-weight: 700;
+  }
+
   footer {
     text-align: center; font-size: 0.72rem; color: #6E93A5; padding: 18px 10px 26px;
   }
@@ -160,7 +284,7 @@
 
 <header>
   <div class="inner">
-    <div class="brand">営業サポートAI<small>MKI ENGINEERING × PARTNER</small></div>
+    <div class="brand">営業サポートポータル<small>MKI ENGINEERING × PARTNER</small></div>
     <button id="logout-btn">ログアウト</button>
   </div>
   <svg class="wave" viewBox="0 0 1200 24" preserveAspectRatio="none" aria-hidden="true">
@@ -192,6 +316,13 @@
     <p class="login-msg" id="login-msg"></p>
   </div>
 
+  <!-- タブナビ(ログイン後に表示) -->
+  <nav id="portal-tabs" aria-label="ページ切り替え">
+    <button class="tab-btn active" data-tab="chat-view">AIチャット</button>
+    <button class="tab-btn" data-tab="products-view">製品ページ</button>
+    <button class="tab-btn" data-tab="talks-view">セールストーク</button>
+  </nav>
+
   <!-- チャット -->
   <div id="chat-view">
     <div class="notice">
@@ -200,11 +331,41 @@
       ・製品名を含めてご質問いただくと、より正確にお答えできます<br>
       ・正式なお見積りは sales@miki-kk.jp へメールでご依頼ください
     </div>
+    <div id="quick-questions">
+      <button class="qq-btn">騒音環境で使えるイヤホンは?</button>
+      <button class="qq-btn">3年保証の内容を教えてください</button>
+      <button class="qq-btn">Buddycomとの接続手順は?</button>
+      <button class="qq-btn">耳を塞がないイヤホンはありますか?</button>
+    </div>
     <div id="messages"></div>
+    <div id="product-chips-wrap">
+      <span class="chip-label">製品を指定(任意):</span>
+      <div id="product-chips"></div>
+    </div>
     <div id="input-bar">
       <input type="text" id="chat-input" placeholder="例: Buddycomと接続するときの設定手順は?">
       <button id="send-btn">送信</button>
     </div>
+  </div>
+
+  <!-- 製品ページ -->
+  <div id="products-view">
+    <div class="notice">
+      <b>製品ラインナップ</b><br>
+      ・仕様の詳細や使い方は「AIに質問する」からご確認いただけます<br>
+      ・価格・納期は sales@miki-kk.jp へお問い合わせください
+    </div>
+    <div id="products-list"></div>
+  </div>
+
+  <!-- セールストーク -->
+  <div id="talks-view">
+    <div class="notice">
+      <b>セールストーク集</b><br>
+      ・環境別の選び方、製品別の訴求ポイント、想定問答をまとめています<br>
+      ・本資料はパートナー様限定です。社外への転載はご遠慮ください
+    </div>
+    <div id="talks-list"><p class="talk-status">読み込み中…</p></div>
   </div>
 </main>
 
@@ -224,21 +385,47 @@
   function $(id) { return document.getElementById(id); }
 
   // ── 画面切り替え ─────────────────────────────
+  var TAB_IDS = ["chat-view", "products-view", "talks-view"];
+  var talksLoaded = false;
+
+  function switchTab(tabId) {
+    TAB_IDS.forEach(function (id) {
+      $(id).style.display = (id === tabId) ? "block" : "none";
+    });
+    var btns = document.querySelectorAll(".tab-btn");
+    for (var i = 0; i < btns.length; i++) {
+      btns[i].className = "tab-btn" + (btns[i].getAttribute("data-tab") === tabId ? " active" : "");
+    }
+    if (tabId === "talks-view" && !talksLoaded) loadTalks();
+  }
+
   function showChat() {
     $("login-view").style.display = "none";
-    $("chat-view").style.display = "block";
+    $("portal-tabs").style.display = "flex";
     $("logout-btn").style.display = "inline-block";
+    switchTab("chat-view");
+    renderProducts();
+    renderProductChips();
     if ($("messages").childElementCount === 0) {
+      $("quick-questions").style.display = "flex";
       addBubble("ai", "こんにちは。製品の使い方・セールスポイント・見積のご相談など、お気軽にご質問ください。");
     }
   }
   function showLogin() {
     $("login-view").style.display = "block";
-    $("chat-view").style.display = "none";
+    $("portal-tabs").style.display = "none";
+    TAB_IDS.forEach(function (id) { $(id).style.display = "none"; });
     $("logout-btn").style.display = "none";
     $("step-email").style.display = "block";
     $("step-code").style.display = "none";
+    talksLoaded = false;
   }
+
+  document.querySelectorAll(".tab-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      switchTab(btn.getAttribute("data-tab"));
+    });
+  });
 
   // ── 起動時: セッションがあればチャットへ ───────
   sb.auth.getSession().then(function (res) {
@@ -298,11 +485,52 @@
     });
   });
 
+  // ── 製品チップ(任意選択) ─────────────────────
+  var selectedProduct = null;   // 例: "MKI-P3(SSW-1010)"
+
+  function renderProductChips() {
+    var wrap = $("product-chips");
+    if (wrap.childElementCount > 0) return;
+    var none = document.createElement("button");
+    none.className = "p-chip active";
+    none.textContent = "指定なし";
+    none.addEventListener("click", function () { selectProduct(null); });
+    wrap.appendChild(none);
+    PRODUCTS.forEach(function (p) {
+      var c = document.createElement("button");
+      c.className = "p-chip";
+      c.textContent = p.model;
+      c.setAttribute("data-product", p.model + "(" + p.alias + ")");
+      c.addEventListener("click", function () {
+        selectProduct(c.getAttribute("data-product"));
+      });
+      wrap.appendChild(c);
+    });
+  }
+  function selectProduct(productLabel) {
+    selectedProduct = productLabel;
+    var chips = document.querySelectorAll(".p-chip");
+    for (var i = 0; i < chips.length; i++) {
+      var isNone = !chips[i].hasAttribute("data-product");
+      var on = productLabel === null ? isNone : chips[i].getAttribute("data-product") === productLabel;
+      chips[i].className = "p-chip" + (on ? " active" : "");
+    }
+  }
+
+  // ── よくある質問チップ ───────────────────────
+  document.querySelectorAll(".qq-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      $("chat-input").value = btn.textContent;
+      sendQuestion();
+    });
+  });
+
   // ── チャット送信 ─────────────────────────────
   function sendQuestion() {
     var q = $("chat-input").value.trim();
     if (!q) return;
     $("chat-input").value = "";
+    $("quick-questions").style.display = "none";
     addBubble("user", q);
     var loadingRow = addBubble("ai", "考えています…", "loading");
     $("send-btn").disabled = true;
@@ -322,7 +550,7 @@
           "Content-Type": "application/json",
           "Authorization": "Bearer " + session.access_token,
         },
-        body: JSON.stringify({ question: q, history: chatHistory }),
+        body: JSON.stringify({ portal: "science_arts", product: selectedProduct, question: q, history: chatHistory }),
       })
         .then(function (r) { return r.json(); })
         .then(function (data) {
@@ -350,6 +578,110 @@
   $("chat-input").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.isComposing) sendQuestion();
   });
+
+  // ── 製品データ ───────────────────────────────
+  var PRODUCTS = [
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P3", alias: "SSW-1010", desc: "Bluetoothスピーカーマイク。スマホをポケットに入れたまま送受信できます。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P3NL", alias: "SSW-1010NL", desc: "MKI-P3のNL仕様モデル。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P4", alias: "SSP-1088D", desc: "スピーカーマイク。充電端子はUSB Type-C仕様に移行しています。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P5", alias: "SSP-1085DS1", desc: "PTT専用タイピンマイク。胸元に付けるコンパクトなタイピン型です。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6", alias: "SSW-1090", desc: "スピーカーマイク。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6NL", alias: "SSW-1090NL", desc: "MKI-P6のNL仕様モデル。" },
+    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6MG", alias: "SSW-1090MG", desc: "マグネットクリップ仕様。制服を傷めずに装着できます。" },
+    { cat: "イヤホンマイク", model: "MKI-P7", alias: "SSW-1060", desc: "コードレスBluetoothイヤホンマイク。USB Type-C to C充電に対応。" },
+    { cat: "イヤホン", model: "MKI-E1", alias: "SSW-1060用", desc: "耳掛けイヤホン(MKI-P7 / SSW-1060用)。" },
+    { cat: "イヤホン", model: "MKI-E2", alias: "SSE-1041H", desc: "遮音イヤホン(穴あき耳栓付き)。騒音環境向けです。" },
+    { cat: "イヤホン", model: "MKI-E4R / MKI-E4L", alias: "SSE-1048-R / SSE-1048-L", desc: "イヤカフ型イヤホン(右用/左用)。耳を塞がないタイプです。" },
+    { cat: "イヤホン", model: "MKI-E6", alias: "SSE-1083H", desc: "カナル型イヤホンマイク。" },
+    { cat: "充電・アクセサリ", model: "MKI-P3CH10-2", alias: "SSZ-1050", desc: "充電ステーション。専用ACアダプター(SSU-1056)は単品購入も可能です。" },
+    { cat: "充電・アクセサリ", model: "MKI-C1", alias: "変換ケーブル", desc: "Φ3.5-Φ2.5プラグ変換ケーブル。" },
+    { cat: "充電・アクセサリ", model: "SSU-1082", alias: "SSW-1010用", desc: "SSW-1010用シリコンケース。単品購入可能です。" },
+    { cat: "充電・アクセサリ", model: "SSU-1083", alias: "SSW-1090用", desc: "SSW-1090用シリコンケース。単品購入可能です。" }
+  ];
+
+  var productsRendered = false;
+  function renderProducts() {
+    if (productsRendered) return;
+    productsRendered = true;
+    var wrap = $("products-list");
+    var currentCat = "";
+    var grid = null;
+    PRODUCTS.forEach(function (p) {
+      if (p.cat !== currentCat) {
+        currentCat = p.cat;
+        var t = document.createElement("h2");
+        t.className = "prod-cat-title";
+        t.textContent = currentCat;
+        wrap.appendChild(t);
+        grid = document.createElement("div");
+        grid.className = "prod-grid";
+        wrap.appendChild(grid);
+      }
+      var card = document.createElement("div");
+      card.className = "prod-card";
+      var m = document.createElement("div");
+      m.className = "prod-model"; m.textContent = p.model;
+      var a = document.createElement("div");
+      a.className = "prod-alias"; a.textContent = p.alias;
+      var d = document.createElement("div");
+      d.className = "prod-desc"; d.textContent = p.desc;
+      var btn = document.createElement("button");
+      btn.className = "prod-ask"; btn.textContent = "AIに質問する";
+      btn.addEventListener("click", function () {
+        switchTab("chat-view");
+        selectProduct(p.model + "(" + p.alias + ")");
+        $("chat-input").value = p.model + "(" + p.alias + ")について教えてください";
+        $("chat-input").focus();
+      });
+      card.appendChild(m); card.appendChild(a); card.appendChild(d); card.appendChild(btn);
+      grid.appendChild(card);
+    });
+  }
+
+  // ── セールストーク読み込み(要ログイン) ───────
+  function loadTalks() {
+    var wrap = $("talks-list");
+    wrap.innerHTML = "<p class=\"talk-status\">読み込み中…</p>";
+    sb.from("sales_talks")
+      .select("category, title, content, sort_order")
+      .order("sort_order", { ascending: true })
+      .order("id", { ascending: true })
+      .then(function (res) {
+        if (res.error) {
+          wrap.innerHTML = "<p class=\"talk-status err\">読み込みに失敗しました。再ログインしてお試しください。</p>";
+          return;
+        }
+        var rows = res.data || [];
+        if (rows.length === 0) {
+          wrap.innerHTML = "<p class=\"talk-status\">現在公開中のセールストークはありません。</p>";
+          talksLoaded = true;
+          return;
+        }
+        wrap.innerHTML = "";
+        var currentCat = "";
+        rows.forEach(function (r) {
+          if (r.category !== currentCat) {
+            currentCat = r.category;
+            var t = document.createElement("h2");
+            t.className = "talk-cat-title";
+            t.textContent = currentCat;
+            wrap.appendChild(t);
+          }
+          var card = document.createElement("div");
+          card.className = "talk-card";
+          if (r.title) {
+            var tt = document.createElement("div");
+            tt.className = "talk-title"; tt.textContent = r.title;
+            card.appendChild(tt);
+          }
+          var body = document.createElement("div");
+          body.className = "talk-body"; body.textContent = r.content || "";
+          card.appendChild(body);
+          wrap.appendChild(card);
+        });
+        talksLoaded = true;
+      });
+  }
 
   // ── ユーティリティ ───────────────────────────
   function addBubble(who, text, extraClass) {
