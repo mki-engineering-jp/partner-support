@@ -572,6 +572,12 @@
     $("chat-input").value = "";
     $("quick-questions").style.display = "none";
     addBubble("user", q);
+    // 金額・社名などを含む場合はAIに送る前に確認する
+    if (looksSensitive(q)) { showSensitiveChoice(q); return; }
+    askAI(q);
+  }
+
+  function askAI(q) {
     var loadingRow = addBubble("ai", "考えています…", "loading");
     $("send-btn").disabled = true;
 
@@ -625,14 +631,67 @@
     if (e.key === "Enter" && !e.isComposing) sendQuestion();
   });
 
+  // ── 機密情報（金額・社名など）の送信前チェック ──
+  var sensitiveCardEl = null;
+
+  function looksSensitive(text) {
+    return /円|万円|いくら|価格|定価|単価|金額|見積|値引|掛け?率|卸値?|仕切|支払|請求|入金|振込|振り込|株式会社|\(株\)|（株）|有限会社|合同会社/.test(text);
+  }
+
+  function showSensitiveChoice(q) {
+    if (sensitiveCardEl && sensitiveCardEl.parentNode) sensitiveCardEl.parentNode.removeChild(sensitiveCardEl);
+
+    var row = document.createElement("div");
+    row.className = "row ai";
+    var card = document.createElement("div");
+    card.className = "handoff-card";
+
+    var title = document.createElement("div");
+    title.className = "handoff-title";
+    title.textContent = "金額や会社名などを含むご質問のようです";
+    var sub = document.createElement("div");
+    sub.className = "handoff-sub";
+    sub.textContent = "このような内容は、AIを通さず担当者へ直接お送りいただけます。担当者からご登録のメールアドレス宛に回答いたします。";
+
+    var actions = document.createElement("div");
+    actions.className = "handoff-actions";
+    var directBtn = document.createElement("button");
+    directBtn.className = "handoff-send";
+    directBtn.textContent = "担当者へ直接転送する";
+    var aiBtn = document.createElement("button");
+    aiBtn.className = "handoff-cancel";
+    aiBtn.textContent = "このままAIに質問する";
+
+    directBtn.addEventListener("click", function () {
+      row.parentNode.removeChild(row);
+      sensitiveCardEl = null;
+      offerHandoff(q, "");
+    });
+    aiBtn.addEventListener("click", function () {
+      row.parentNode.removeChild(row);
+      sensitiveCardEl = null;
+      askAI(q);
+    });
+
+    actions.appendChild(directBtn);
+    actions.appendChild(aiBtn);
+    card.appendChild(title);
+    card.appendChild(sub);
+    card.appendChild(actions);
+    row.appendChild(card);
+    $("messages").appendChild(row);
+    sensitiveCardEl = row;
+    row.scrollIntoView({ block: "end" });
+  }
+
   // ── 担当者への転送（AI未回答時） ─────────────
   var lastQuestion = "";
   var lastAnswer = "";
   var handoffCardEl = null;
 
-  // AIが回答できなかったと思われる文言の検出
+  // AIが回答できなかった／担当者への確認を促していると思われる文言の検出
   function looksUnanswered(text) {
-    return /わかりかね|分かりかね|お答えできま|回答できま|お答えいたしかね|情報があ?りません|情報が見つかりません|資料がありません|確認できませんでした|持ち合わせて(い|お)りません/.test(text);
+    return /わかりかね|分かりかね|わかりません|分かりません|お答えできま|回答できま|お答えいたしかね|情報があ?りません|情報[^。]{0,14}(ない|ございません)|資料[^。]{0,10}(ない|ありません|ございません)|見つかりませんでした?|確認できませんでした|持ち合わせて(い|お)りません|把握して(い|お)りません|お問い?合わせください|お問い?合わせをお願い|不明です/.test(text);
   }
 
   $("handoff-open-btn").addEventListener("click", function () {
