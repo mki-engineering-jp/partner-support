@@ -267,6 +267,44 @@
     border-color: transparent; color: #fff; font-weight: 700;
   }
 
+  /* ── 担当者転送カード ─────────────────────── */
+  .handoff-card {
+    max-width: 82%;
+    background: var(--white); border: 1.5px solid var(--sky);
+    border-radius: 16px; border-bottom-left-radius: 5px;
+    padding: 14px 16px;
+    box-shadow: 0 6px 16px rgba(46,159,216,0.16);
+  }
+  .handoff-title { font-size: 0.9rem; font-weight: 700; margin-bottom: 3px; }
+  .handoff-sub { font-size: 0.78rem; color: #4A6E80; margin-bottom: 10px; line-height: 1.7; }
+  .handoff-label { display: block; font-size: 0.72rem; font-weight: 700; color: #4A6E80; margin-bottom: 4px; }
+  .handoff-card textarea {
+    width: 100%; padding: 9px 12px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    font-size: 0.85rem; font-family: inherit; color: var(--deep);
+    background: #FBFEFF; outline: none; resize: vertical; margin-bottom: 8px;
+  }
+  .handoff-card textarea:focus { border-color: var(--sky); }
+  .handoff-actions { display: flex; gap: 8px; }
+  .handoff-send {
+    border: none; border-radius: 999px; padding: 9px 20px;
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; font-size: 0.82rem; font-weight: 700; font-family: "Zen Maru Gothic", sans-serif;
+    cursor: pointer; box-shadow: 0 4px 12px rgba(46,159,216,0.28);
+  }
+  .handoff-send:disabled { opacity: 0.55; cursor: default; }
+  .handoff-cancel {
+    border: 1.5px solid var(--line); border-radius: 999px; padding: 9px 16px;
+    background: none; color: #4A6E80; font-size: 0.82rem; font-family: inherit; cursor: pointer;
+  }
+  .handoff-cancel:hover { background: var(--mist); }
+  .handoff-link {
+    background: none; border: none; padding: 0;
+    color: var(--sky); font-family: inherit; font-size: inherit;
+    cursor: pointer; text-decoration: underline;
+  }
+  .handoff-link:hover { color: var(--aqua); }
+
   footer {
     text-align: center; font-size: 0.72rem; color: #6E93A5; padding: 18px 10px 26px;
   }
@@ -329,7 +367,8 @@
       <b>ご利用にあたって</b><br>
       ・お客様名などの個人情報は入力しないでください<br>
       ・製品名を含めてご質問いただくと、より正確にお答えできます<br>
-      ・正式なお見積りは sales@miki-kk.jp へメールでご依頼ください
+      ・正式なお見積りは sales@miki-kk.jp へメールでご依頼ください<br>
+      ・<button class="handoff-link" id="handoff-open-btn" type="button">AIで解決しない場合は、質問を担当者へ転送できます</button>
     </div>
     <div id="quick-questions">
       <button class="qq-btn">騒音環境で使えるイヤホンは?</button>
@@ -377,6 +416,7 @@
   var SUPABASE_URL = "https://adatzeolzkjujtuxebrc.supabase.co";
   var SUPABASE_KEY = "sb_publishable_2Ghe-V3dLS7Ym06p71i33A_zFU8eJgz";
   var FUNCTION_URL = SUPABASE_URL + "/functions/v1/dealer-chat";
+  var HANDOFF_URL = SUPABASE_URL + "/functions/v1/dealer-handoff";
 
   var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
   var chatHistory = [];   // ※ window.history と衝突しないよう chatHistory を使用
@@ -556,10 +596,16 @@
         .then(function (data) {
           loadingRow.remove();
           if (data.answer) {
-            addBubble("ai", data.answer);
+            // [UNANSWERED]フラグ（Edge Function側で付与された場合）は表示前に除去
+            var flagged = data.answer.indexOf("[UNANSWERED]") !== -1;
+            var answer = data.answer.replace(/\s*\[UNANSWERED\]\s*/g, "").trim();
+            addBubble("ai", answer);
             chatHistory.push({ role: "user", content: q });
-            chatHistory.push({ role: "assistant", content: data.answer });
+            chatHistory.push({ role: "assistant", content: answer });
             if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+            lastQuestion = q;
+            lastAnswer = answer;
+            if (flagged || looksUnanswered(answer)) offerHandoff(q, answer);
           } else {
             addBubble("ai", data.error || "エラーが発生しました。", "error");
           }
@@ -578,6 +624,119 @@
   $("chat-input").addEventListener("keydown", function (e) {
     if (e.key === "Enter" && !e.isComposing) sendQuestion();
   });
+
+  // ── 担当者への転送（AI未回答時） ─────────────
+  var lastQuestion = "";
+  var lastAnswer = "";
+  var handoffCardEl = null;
+
+  // AIが回答できなかったと思われる文言の検出
+  function looksUnanswered(text) {
+    return /わかりかね|分かりかね|お答えできま|回答できま|お答えいたしかね|情報があ?りません|情報が見つかりません|資料がありません|確認できませんでした|持ち合わせて(い|お)りません/.test(text);
+  }
+
+  $("handoff-open-btn").addEventListener("click", function () {
+    offerHandoff(lastQuestion, lastAnswer);
+  });
+
+  function offerHandoff(question, answer) {
+    if (handoffCardEl && handoffCardEl.parentNode) handoffCardEl.parentNode.removeChild(handoffCardEl);
+
+    var row = document.createElement("div");
+    row.className = "row ai";
+    var card = document.createElement("div");
+    card.className = "handoff-card";
+
+    var title = document.createElement("div");
+    title.className = "handoff-title";
+    title.textContent = "この質問を担当者へ転送しますか？";
+    var sub = document.createElement("div");
+    sub.className = "handoff-sub";
+    sub.textContent = "担当者が内容を確認し、ご登録のメールアドレス宛に回答いたします。";
+
+    var qLabel = document.createElement("label");
+    qLabel.className = "handoff-label";
+    qLabel.textContent = "質問内容（編集できます）";
+    var qArea = document.createElement("textarea");
+    qArea.rows = 3;
+    qArea.value = question || "";
+
+    var nLabel = document.createElement("label");
+    nLabel.className = "handoff-label";
+    nLabel.textContent = "補足・お急ぎの場合の連絡先など（任意）";
+    var nArea = document.createElement("textarea");
+    nArea.rows = 2;
+    nArea.placeholder = "例: 本日中にご連絡いただけると助かります（TEL 00-0000-0000）";
+
+    var actions = document.createElement("div");
+    actions.className = "handoff-actions";
+    var sendBtn = document.createElement("button");
+    sendBtn.className = "handoff-send";
+    sendBtn.textContent = "担当者へ転送する";
+    var cancelBtn = document.createElement("button");
+    cancelBtn.className = "handoff-cancel";
+    cancelBtn.textContent = "閉じる";
+
+    cancelBtn.addEventListener("click", function () {
+      row.parentNode.removeChild(row);
+      handoffCardEl = null;
+    });
+
+    sendBtn.addEventListener("click", function () {
+      var q = qArea.value.trim();
+      if (!q) { qArea.focus(); return; }
+      sendBtn.disabled = true;
+      sendBtn.textContent = "送信中…";
+      sb.auth.getSession().then(function (res) {
+        var session = res.data && res.data.session;
+        if (!session) { showLogin(); return; }
+        return fetch(HANDOFF_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": "Bearer " + session.access_token,
+          },
+          body: JSON.stringify({
+            portal: "science_arts",
+            product: selectedProduct,
+            question: q,
+            answer: answer || "",
+            note: nArea.value.trim()
+          })
+        });
+      }).then(function (resp) {
+        return resp.json().then(function (data) { return { ok: resp.ok, data: data }; });
+      }).then(function (r) {
+        if (!r.ok || r.data.error) {
+          sendBtn.disabled = false;
+          sendBtn.textContent = "担当者へ転送する";
+          addBubble("ai", r.data.error || "転送に失敗しました。時間をおいて再度お試しください。", "error");
+          return;
+        }
+        row.parentNode.removeChild(row);
+        handoffCardEl = null;
+        addBubble("ai", "担当者へ転送しました。ご登録のメールアドレス宛に回答いたしますので、しばらくお待ちください。");
+      }).catch(function () {
+        sendBtn.disabled = false;
+        sendBtn.textContent = "担当者へ転送する";
+        addBubble("ai", "通信エラーが発生しました。再度お試しください。", "error");
+      });
+    });
+
+    actions.appendChild(sendBtn);
+    actions.appendChild(cancelBtn);
+    card.appendChild(title);
+    card.appendChild(sub);
+    card.appendChild(qLabel);
+    card.appendChild(qArea);
+    card.appendChild(nLabel);
+    card.appendChild(nArea);
+    card.appendChild(actions);
+    row.appendChild(card);
+    $("messages").appendChild(row);
+    handoffCardEl = row;
+    row.scrollIntoView({ block: "end" });
+  }
 
   // ── 製品データ ───────────────────────────────
   var PRODUCTS = [
