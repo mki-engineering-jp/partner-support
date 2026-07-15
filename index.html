@@ -239,6 +239,14 @@
   #product-panel ul { margin: 0; padding-left: 18px; }
   #product-panel li { font-size: 0.78rem; line-height: 1.7; }
 
+  /* ── 聞き比べ ───────────────────────────── */
+  #kikikurabe-view { display: none; }
+  #kikikurabe-frame {
+    width: 100%; height: 74vh; min-height: 420px;
+    border: 1px solid var(--line); border-radius: var(--radius);
+    background: var(--white); display: block;
+  }
+
   /* ── セールストーク ─────────────────────── */
   #talks-view { display: none; }
   .talk-cat-title {
@@ -393,6 +401,7 @@
     <button class="tab-btn active" data-tab="chat-view">AIチャット</button>
     <button class="tab-btn" data-tab="products-view">製品ページ</button>
     <button class="tab-btn" data-tab="talks-view">セールストーク</button>
+    <button class="tab-btn" data-tab="kikikurabe-view">聞き比べ</button>
   </nav>
 
   <!-- チャット -->
@@ -432,6 +441,17 @@
     <div id="products-list"></div>
   </div>
 
+  <!-- 聞き比べ -->
+  <div id="kikikurabe-view">
+    <div class="notice">
+      <b>騒音下での音声認識 聞き比べ</b><br>
+      ・パチンコ店を想定した80〜90dBの騒音下で、マイク5種の録音とBuddycomの音声認識結果を比較できます<br>
+      ・商談の際は、お客様の店舗騒音に近い条件の音源をお聞かせください<br>
+      ・<a href="kikikurabe.html" target="_blank" rel="noopener">別ウィンドウで大きく開く</a>
+    </div>
+    <iframe id="kikikurabe-frame" src="" data-src="kikikurabe.html" title="騒音下音声認識 聞き比べ" loading="lazy"></iframe>
+  </div>
+
   <!-- セールストーク -->
   <div id="talks-view">
     <div class="notice">
@@ -460,7 +480,7 @@
   function $(id) { return document.getElementById(id); }
 
   // ── 画面切り替え ─────────────────────────────
-  var TAB_IDS = ["chat-view", "products-view", "talks-view"];
+  var TAB_IDS = ["chat-view", "products-view", "talks-view", "kikikurabe-view"];
   var talksLoaded = false;
 
   function switchTab(tabId) {
@@ -472,6 +492,10 @@
       btns[i].className = "tab-btn" + (btns[i].getAttribute("data-tab") === tabId ? " active" : "");
     }
     if (tabId === "talks-view" && !talksLoaded) loadTalks();
+    if (tabId === "kikikurabe-view") {
+      var fr = $("kikikurabe-frame");
+      if (fr && !fr.getAttribute("src")) fr.setAttribute("src", fr.getAttribute("data-src"));
+    }
   }
 
   function showChat() {
