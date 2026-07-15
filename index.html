@@ -204,6 +204,40 @@
     transition: background .12s, color .12s;
   }
   .prod-ask:hover { background: var(--sky); color: #fff; border-color: var(--sky); }
+  .prod-img {
+    width: 100%; height: 140px; object-fit: contain;
+    background: #fff; border-radius: 12px; border: 1px solid var(--line);
+    padding: 8px; margin-bottom: 4px;
+  }
+  .prod-detail-btn {
+    align-self: flex-start;
+    border: none; background: none; padding: 2px 0;
+    color: #4A6E80; font-size: 0.76rem; font-weight: 700; font-family: inherit;
+    cursor: pointer; text-decoration: underline; text-underline-offset: 3px;
+  }
+  .prod-detail-btn:hover { color: var(--sky); }
+  .prod-detail { display: none; border-top: 1px dashed var(--line); padding-top: 10px; margin-top: 4px; }
+  .prod-detail.open { display: block; }
+  .prod-detail h4 {
+    font-size: 0.74rem; font-weight: 700; color: var(--sky);
+    margin: 8px 0 4px; letter-spacing: 0.04em;
+  }
+  .prod-detail h4:first-child { margin-top: 0; }
+  .prod-detail ul { margin: 0; padding-left: 18px; }
+  .prod-detail li { font-size: 0.78rem; line-height: 1.7; margin-bottom: 2px; }
+  .prod-detail p { font-size: 0.78rem; line-height: 1.75; color: var(--deep); word-break: break-word; }
+
+  /* ── チャット内 製品特長パネル ─────────────── */
+  #product-panel {
+    display: none;
+    background: var(--white);
+    border: 1.5px solid var(--line); border-radius: 14px;
+    padding: 12px 16px; margin-top: 10px;
+  }
+  #product-panel .pp-title { font-size: 0.85rem; font-weight: 700; margin-bottom: 4px; }
+  #product-panel .pp-title small { font-weight: 500; color: #4A6E80; margin-left: 6px; }
+  #product-panel ul { margin: 0; padding-left: 18px; }
+  #product-panel li { font-size: 0.78rem; line-height: 1.7; }
 
   /* ── セールストーク ─────────────────────── */
   #talks-view { display: none; }
@@ -381,6 +415,7 @@
       <span class="chip-label">製品を指定(任意):</span>
       <div id="product-chips"></div>
     </div>
+    <div id="product-panel"></div>
     <div id="input-bar">
       <input type="text" id="chat-input" placeholder="例: Buddycomと接続するときの設定手順は?">
       <button id="send-btn">送信</button>
@@ -555,6 +590,36 @@
       var on = productLabel === null ? isNone : chips[i].getAttribute("data-product") === productLabel;
       chips[i].className = "p-chip" + (on ? " active" : "");
     }
+    renderProductPanel(productLabel);
+  }
+
+  // ── 製品選択時の特長パネル(v3.2) ─────────────
+  function renderProductPanel(productLabel) {
+    var panel = $("product-panel");
+    if (!productLabel) { panel.style.display = "none"; panel.innerHTML = ""; return; }
+    var p = null;
+    for (var i = 0; i < PRODUCTS.length; i++) {
+      if (PRODUCTS[i].model + "(" + PRODUCTS[i].alias + ")" === productLabel) { p = PRODUCTS[i]; break; }
+    }
+    if (!p) { panel.style.display = "none"; panel.innerHTML = ""; return; }
+    panel.innerHTML = "";
+    var t = document.createElement("div");
+    t.className = "pp-title";
+    t.textContent = p.model;
+    var s = document.createElement("small");
+    s.textContent = p.alias + " / " + p.name;
+    t.appendChild(s);
+    panel.appendChild(t);
+    if (p.features && p.features.length) {
+      var ul = document.createElement("ul");
+      p.features.forEach(function (f) {
+        var li = document.createElement("li");
+        li.textContent = f;
+        ul.appendChild(li);
+      });
+      panel.appendChild(ul);
+    }
+    panel.style.display = "block";
   }
 
   // ── よくある質問チップ ───────────────────────
@@ -797,24 +862,123 @@
     row.scrollIntoView({ block: "end" });
   }
 
-  // ── 製品データ ───────────────────────────────
+  // ── 製品データ v3.2(製品マスタ記入シート 18品目版・2026-07-14 確定分) ───
+  // img は images/products/ 配下に写真を置くと表示されます(未配置の間は自動非表示)
   var PRODUCTS = [
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P3", alias: "SSW-1010", desc: "Bluetoothスピーカーマイク。スマホをポケットに入れたまま送受信できます。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P3NL", alias: "SSW-1010NL", desc: "MKI-P3のNL仕様モデル。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P4", alias: "SSP-1088D", desc: "スピーカーマイク。充電端子はUSB Type-C仕様に移行しています。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P5", alias: "SSP-1085DS1", desc: "PTT専用タイピンマイク。胸元に付けるコンパクトなタイピン型です。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6", alias: "SSW-1090", desc: "スピーカーマイク。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6NL", alias: "SSW-1090NL", desc: "MKI-P6のNL仕様モデル。" },
-    { cat: "スピーカーマイク・PTTマイク", model: "MKI-P6MG", alias: "SSW-1090MG", desc: "マグネットクリップ仕様。制服を傷めずに装着できます。" },
-    { cat: "イヤホンマイク", model: "MKI-P7", alias: "SSW-1060", desc: "コードレスBluetoothイヤホンマイク。USB Type-C to C充電に対応。" },
-    { cat: "イヤホン", model: "MKI-E1", alias: "SSW-1060用", desc: "耳掛けイヤホン(MKI-P7 / SSW-1060用)。" },
-    { cat: "イヤホン", model: "MKI-E2", alias: "SSE-1041H", desc: "遮音イヤホン(穴あき耳栓付き)。騒音環境向けです。" },
-    { cat: "イヤホン", model: "MKI-E4R / MKI-E4L", alias: "SSE-1048-R / SSE-1048-L", desc: "イヤカフ型イヤホン(右用/左用)。耳を塞がないタイプです。" },
-    { cat: "イヤホン", model: "MKI-E6", alias: "SSE-1083H", desc: "カナル型イヤホンマイク。" },
-    { cat: "充電・アクセサリ", model: "MKI-P3CH10-2", alias: "SSZ-1050", desc: "充電ステーション。専用ACアダプター(SSU-1056)は単品購入も可能です。" },
-    { cat: "充電・アクセサリ", model: "MKI-C1", alias: "変換ケーブル", desc: "Φ3.5-Φ2.5プラグ変換ケーブル。" },
-    { cat: "充電・アクセサリ", model: "SSU-1082", alias: "SSW-1010用", desc: "SSW-1010用シリコンケース。単品購入可能です。" },
-    { cat: "充電・アクセサリ", model: "SSU-1083", alias: "SSW-1090用", desc: "SSW-1090用シリコンケース。単品購入可能です。" }
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P3", alias: "SSW-1010", name: "ワイヤレスタイピンマイク(Buddycomロゴあり)", img: "images/products/MKI-P3.jpg",
+      desc: "ファンクションボタン搭載のBluetoothタイピンマイク。外部マイク切替やLED消灯など多彩なモードに対応します。",
+      features: ["PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替(MF+F1)/PTTボタンモード(MF+F2)/LED消灯モード(MF+F3)", "ミュート機能", "シリコンケース装着済み"],
+      specs: "バッテリー240mAh(DC3.7V)/充電端子Type-C・充電約1.5h/連続使用最大約15h/2.5mmイヤホンジャック/Bluetooth5.0/重量21.6g(本体のみ)/IPX3/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×37×12.5mm(クリップ部除く)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P3NL", alias: "SSW-1010NL", name: "ワイヤレスタイピンマイク(Buddycomロゴなし)", img: "images/products/MKI-P3NL.jpg",
+      desc: "MKI-P3のBuddycomロゴなし仕様。機能・仕様はMKI-P3と共通です。",
+      features: ["NL=Buddycomロゴなし仕様", "PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替/PTTボタンモード/LED消灯モード", "ミュート機能"],
+      specs: "バッテリー240mAh(DC3.7V)/充電端子Type-C・充電約1.5h/連続使用最大約15h/2.5mmイヤホンジャック/Bluetooth5.0/重量21.6g(本体のみ)/IPX3/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×37×12.5mm(クリップ部除く)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6", alias: "SSW-1090", name: "ワイヤレスタイピンマイク(接話型)", img: "images/products/MKI-P6.jpg",
+      desc: "双指向性ノイズキャンセル搭載の接話型Bluetoothタイピンマイク。騒音環境での音声認識に強いモデルです。",
+      features: ["双指向性ノイズキャンセル(接話型)", "ファンクションボタン搭載", "シリコンケース装着済み"],
+      specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×38×13.5mm(クリップ部除く)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6NL", alias: "SSW-1090NL", name: "ワイヤレスタイピンマイク(接話型・ロゴなし)", img: "images/products/MKI-P6NL.jpg",
+      desc: "MKI-P6のBuddycomロゴなし仕様。機能・仕様はMKI-P6と共通です。",
+      features: ["NL=Buddycomロゴなし仕様", "双指向性ノイズキャンセル(接話型)", "ファンクションボタン搭載"],
+      specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×38×13.5mm(クリップ部除く)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6MG", alias: "SSW-1090MG", name: "ワイヤレスタイピンマイク(マグネット)", img: "images/products/MKI-P6MG.jpg",
+      desc: "マグネット(磁石)クリップ仕様。制服を傷めずに装着でき、胸元での発話でもしっかり声を拾います。",
+      features: ["マグネット(磁石)クリップ仕様", "双指向性ノイズキャンセル", "双指向性マイクながら単一指向性のように胸元発話でも音を拾う調整", "ファンクションボタン搭載"],
+      specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P7", alias: "SSW-1060", name: "ワイヤレス小型タイピンマイク", img: "images/products/MKI-P7.jpg",
+      desc: "約15gと軽量・小型のシンプルなBluetoothタイピンマイク。小型ながらバッテリーは12時間持続します。",
+      features: ["約15gの軽量・小型ボディ", "シンプル操作", "ミュート機能"],
+      specs: "Bluetooth5.0/連続使用最大約12h/充電約1.5h/重量15g(本体のみ)/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体39×31×14mm(クリップ部除く)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル/クイックスタートガイド" },
+    { cat: "有線マイク", model: "MKI-P4", alias: "SSP-1088D", name: "有線スピーカーマイク", img: "images/products/MKI-P4.jpg",
+      desc: "頑丈な有線スピーカーマイク。スピーカーから音声が聞こえ、LEDトーチも搭載しています。",
+      features: ["頑丈なボディ(IP65)", "スピーカーから音声出力", "LEDトーチ搭載", "PTT対応"],
+      specs: "IP65/充電端子Type-C・充電約4.0h/連続使用最大約48h/3.5mmイヤホンジャック/重量250g(ケーブル含む)/本体78.7×57×27.5mm/ケーブル長約450mm(圧縮時)/4極3.5mmイヤホンプラグ(CTIA規格)",
+      connect: "Buddycom対応/iOS・Android対応",
+      includes: "Type-Cケーブル" },
+    { cat: "有線マイク", model: "MKI-P2S1", alias: "SSP-1085DS1", name: "1ボタンタイピンマイク(単一指向性)", img: "images/products/MKI-P2S1.jpg",
+      desc: "単一指向性マイクで周囲音を低減。胸元で発話しても声をしっかり拾う有線PTTマイクです。",
+      features: ["単一指向性マイク(胸元発話でも声を拾う)", "周囲音を低減", "PTTボタン", "360°回転クリップ", "風防(大)は風の音が強い時に使用"],
+      specs: "PTTマイク/有線/カールコード/重量40g/本体42×29×14mm/PTTスイッチ1000万回以上動作保証/電池不要/360°回転クリップ",
+      connect: "Buddycom対応/iOS・Android対応/3.5mm(CTIA規格)イヤホンプラグ接続/2.5mmイヤホンジャック",
+      includes: "風防(大)/風防(小)" },
+    { cat: "有線マイク", model: "MKI-P5", alias: "SSP-1084D", name: "1ボタンタイピンマイク(接話型)", img: "images/products/MKI-P5.jpg",
+      desc: "PTT専用の耐騒音接話型マイク(双指向性)。口元に寄せて発話することでノイズを抑え、声を確実に伝えます。",
+      features: ["耐騒音接話型(双指向性)", "口元に寄せて発話することでノイズを抑制", "PTTボタン", "360°回転クリップ", "風防(大)は風の音が強い時に使用"],
+      specs: "PTTマイク/有線/カールコード/重量40g/本体42×29×14mm/PTTスイッチ1000万回以上動作保証/電池不要/360°回転クリップ",
+      connect: "Buddycom対応/iOS・Android対応/3.5mm(CTIA規格)イヤホンジャック接続",
+      includes: "風防(大)/風防(小)" },
+    { cat: "有線マイク", model: "MKI-P1S1", alias: "SSP-1062DS1", name: "有線4つボタンマイク", img: "images/products/MKI-P1S1.jpg",
+      desc: "PTT・トグル・音量＋−の4つボタンを搭載した有線マイク。電池不要で使えるメイドインジャパンの高耐久モデルです。",
+      features: ["4つボタン搭載(PTT・トグル・音量＋−)", "高耐久PTTボタン(1000万回耐久)", "バッテリーレス(電池不要)", "360°回転クリップ", "無指向性マイク/メイドインジャパン"],
+      specs: "PTTマイク/有線/カールコード/重量41g/本体41×33×13mm/PTTスイッチ1000万回以上動作保証/電池不要",
+      connect: "3.5mmプラグ",
+      includes: "-" },
+    { cat: "有線マイク", model: "MKI-G1", alias: "SSP-1059", name: "有線イヤホンマイク(耳掛け一体型)", img: "images/products/MKI-G1.jpg",
+      desc: "ボタン短押しで通話開始/終了できるトグル式。イヤホンマイク一体型で管理がしやすいモデルです。",
+      features: ["ボタン短押しで通話開始/終了(トグル)", "360度回転クリップで左右装着可", "電話応答/切断対応", "イヤホンマイク一体型"],
+      specs: "トグルボタン耐久100万回以上/エレクトレットコンデンサーマイク/防塵防水なし/動作環境温度-10〜50℃/3.5mm CTIA規格接続",
+      connect: "3.5mmプラグ",
+      includes: "-" },
+    { cat: "イヤホン", model: "MKI-E1", alias: "SSE-1024", name: "耳掛けイヤホン(スポンジ付き)", img: "images/products/MKI-E1.jpg",
+      desc: "左右どちらの耳でも使えるイヤースピーカー型の耳掛けイヤホンです。",
+      features: ["左右兼用可能", "耳の中に入れないイヤースピーカー型"],
+      specs: "2.5mmプラグ/8Ω",
+      connect: "2.5mmプラグ",
+      includes: "-" },
+    { cat: "イヤホン", model: "MKI-E2", alias: "SSE-1041H", name: "高遮音マグネチックイヤホン", img: "images/products/MKI-E2.jpg",
+      desc: "外部の音を90%防ぐ高遮音イヤホン。穴あきイヤーピースに替えれば低遮音でも使える日本生産モデルです。",
+      features: ["遮音性能規格値-30dB減衰(外部の音を90%防ぐ)", "穴あきイヤーピース付き(低遮音)", "強耐久ケーブル(20万回以上の屈折テストをクリア)", "防滴仕様/日本生産"],
+      specs: "遮音性能規格値-30dB減衰/コード長約50cm/防滴仕様",
+      connect: "2.5mmプラグ",
+      includes: "イヤーピースS・M・L(M装着済み)/穴あきイヤーピース付き" },
+    { cat: "イヤホン", model: "MKI-E4R / MKI-E4L", alias: "SSE-1048-R / SSE-1048-L", name: "イヤカフ型イヤホン(左右別)", img: "images/products/MKI-E4.jpg",
+      desc: "耳に挟むイヤカフタイプ。耳を塞がず痛くなりにくい軽量イヤホンです(R=右耳用/L=左耳用・左右別売)。",
+      features: ["イヤカフタイプで耳を塞がない", "痛くなりにくい・軽量", "ファブリックケーブル(布)で高耐久", "左右兼用不可(R=右耳用/L=左耳用・左右別売)"],
+      specs: "-",
+      connect: "2.5mmプラグ",
+      includes: "-" },
+    { cat: "イヤホン", model: "MKI-E6", alias: "SSE-1083H", name: "カナル型イヤホン", img: "images/products/MKI-E6.jpg",
+      desc: "穴あきイヤーピースも装着できるカナル型イヤホン。耐久性の高いコードを採用しています。",
+      features: ["穴あきイヤーピース装着可能", "耐久性の高いコード"],
+      specs: "-",
+      connect: "2.5mmプラグ",
+      includes: "イヤーピースS・M・L(M装着済み)/穴あきイヤーピースは発注時に指定" },
+    { cat: "充電・アクセサリ", model: "MKI-P3CH10-2", alias: "SSZ-1050", name: "充電ステーション", img: "images/products/MKI-P3CH10-2.jpg",
+      desc: "10台同時充電できる充電ステーション。過充電防止機能を搭載し、シリコンケース有り/無しを選択できます。",
+      features: ["同時充電台数10台", "過充電防止機能搭載", "各アダプター付き(SSW-1010/SSW-1060)", "シリコンケース有り・無しを選択可能"],
+      specs: "同時充電台数10台/5V ACアダプター付き/ロゴシール付き/シリアルナンバー記載",
+      connect: "対応機種: MKI-P3・P6・P7専用/SSU-1056(AC)単品可",
+      includes: "アダプター付き各10個(SSW-1010/SSW-1060)/ACアダプター/白箱入り" },
+    { cat: "充電・アクセサリ", model: "SSU-1082", alias: "SSW-1010用", name: "シリコンケース(単品)", img: "images/products/SSU-1082.jpg",
+      desc: "SSW-1010(MKI-P3)用シリコンケース。10個入りです。",
+      features: ["10個入り"],
+      specs: "-",
+      connect: "SSW-1010用シリコンケース",
+      includes: "-" },
+    { cat: "充電・アクセサリ", model: "SSU-1083", alias: "SSW-1090用", name: "シリコンケース(単品)", img: "images/products/SSU-1083.jpg",
+      desc: "SSW-1090(MKI-P6)用シリコンケース。10個入りです。",
+      features: ["10個入り"],
+      specs: "-",
+      connect: "SSW-1090用シリコンケース",
+      includes: "-" },
+    { cat: "設備接続", model: "MKI-IF1", alias: "SSZ-1022", name: "オーディオインターフェース", img: "images/products/MKI-IF1.jpg",
+      desc: "スマホと外部機器・放送設備を接続し、音声入出力を双方向で実現。ノイズ低減アイソレーション機構を搭載しています。",
+      features: ["スマホと外部機器・設備を双方向接続", "ノイズ低減アイソレーション機構", "スマホを充電しながら使用可能"],
+      specs: "本体200×135×42mm/質量約500g/消費電力最大3W/USB給電2.5W(5V/500mA max.)/動作温度0〜40℃/専用ACアダプタ(DC5V 600mA・コード約180cm)",
+      connect: "",
+      includes: "USB Type-A-3.5mm変換ケーブル×1/両端3.5mm 4極ケーブル×2/両端3.5mm 3極ケーブル×1" }
   ];
 
   var productsRendered = false;
@@ -837,12 +1001,68 @@
       }
       var card = document.createElement("div");
       card.className = "prod-card";
+      if (p.img) {
+        var im = document.createElement("img");
+        im.className = "prod-img";
+        im.src = p.img;
+        im.alt = p.model + " " + (p.name || "");
+        im.loading = "lazy";
+        im.onerror = function () { this.style.display = "none"; };
+        card.appendChild(im);
+      }
       var m = document.createElement("div");
       m.className = "prod-model"; m.textContent = p.model;
       var a = document.createElement("div");
-      a.className = "prod-alias"; a.textContent = p.alias;
+      a.className = "prod-alias"; a.textContent = p.alias + (p.name ? " / " + p.name : "");
       var d = document.createElement("div");
       d.className = "prod-desc"; d.textContent = p.desc;
+      card.appendChild(m); card.appendChild(a); card.appendChild(d);
+
+      // 特長・仕様パネル(v3.2)
+      var hasDetail = (p.features && p.features.length) || (p.specs && p.specs !== "-") || (p.includes && p.includes !== "-");
+      if (hasDetail) {
+        var detail = document.createElement("div");
+        detail.className = "prod-detail";
+        if (p.features && p.features.length) {
+          var fh = document.createElement("h4"); fh.textContent = "特長";
+          detail.appendChild(fh);
+          var ul = document.createElement("ul");
+          p.features.forEach(function (f) {
+            var li = document.createElement("li"); li.textContent = f;
+            ul.appendChild(li);
+          });
+          detail.appendChild(ul);
+        }
+        if (p.specs && p.specs !== "-") {
+          var sh = document.createElement("h4"); sh.textContent = "主な仕様";
+          detail.appendChild(sh);
+          var sp = document.createElement("p"); sp.textContent = p.specs;
+          detail.appendChild(sp);
+        }
+        if (p.connect) {
+          var ch = document.createElement("h4"); ch.textContent = "対応・接続";
+          detail.appendChild(ch);
+          var cp = document.createElement("p"); cp.textContent = p.connect;
+          detail.appendChild(cp);
+        }
+        if (p.includes && p.includes !== "-") {
+          var ih = document.createElement("h4"); ih.textContent = "付属品";
+          detail.appendChild(ih);
+          var ip = document.createElement("p"); ip.textContent = p.includes;
+          detail.appendChild(ip);
+        }
+        var toggle = document.createElement("button");
+        toggle.className = "prod-detail-btn";
+        toggle.textContent = "特長・仕様を見る ▾";
+        toggle.addEventListener("click", function () {
+          var open = detail.className.indexOf("open") >= 0;
+          detail.className = "prod-detail" + (open ? "" : " open");
+          toggle.textContent = open ? "特長・仕様を見る ▾" : "閉じる ▴";
+        });
+        card.appendChild(toggle);
+        card.appendChild(detail);
+      }
+
       var btn = document.createElement("button");
       btn.className = "prod-ask"; btn.textContent = "AIに質問する";
       btn.addEventListener("click", function () {
@@ -851,7 +1071,7 @@
         $("chat-input").value = p.model + "(" + p.alias + ")について教えてください";
         $("chat-input").focus();
       });
-      card.appendChild(m); card.appendChild(a); card.appendChild(d); card.appendChild(btn);
+      card.appendChild(btn);
       grid.appendChild(card);
     });
   }
