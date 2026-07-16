@@ -210,6 +210,8 @@
     padding: 8px; margin-bottom: 4px;
     cursor: zoom-in;
   }
+  /* 小型製品(MKI-P7など): 余白を増やして実物の小ささが伝わるように小さめに表示 */
+  .prod-img.prod-img-sm { padding: 34px; }
 
   /* ── 画像拡大(ライトボックス) ─────────────── */
   #lightbox {
@@ -923,36 +925,36 @@
   // img は images/products/ 配下に写真を置くと表示されます(未配置の間は自動非表示)
   var PRODUCTS = [
     { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P3", alias: "SSW-1010", name: "ワイヤレスタイピンマイク(Buddycomロゴあり)", img: "images/products/MKI-P3.jpg",
-      desc: "ファンクションボタン搭載のBluetoothタイピンマイク。外部マイク切替やLED消灯など多彩なモードに対応します。",
-      features: ["PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替(MF+F1)/PTTボタンモード(MF+F2)/LED消灯モード(MF+F3)", "ミュート機能", "シリコンケース装着済み"],
+      desc: "PTT・MF・F1〜F3の5ボタンを搭載したBluetoothタイピンマイク。外部マイク切替やLED消灯など多彩なモードに対応します。",
+      features: ["PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替(MF+F3)＝イヤホンジャックに接続した外部マイクにマイク機能のみ切替(本体でのPTT操作は可能)", "PTTボタンモード(MF+F1)＝本体マイクが効かない状態になり、PTTボタン操作のみ", "LED消灯モード(MF+F2)＝電源ON後に周期点灯するLEDを消灯(アミューズメントパークなど暗がりで目立たせたくない場面に)", "ミュート機能"],
       specs: "バッテリー240mAh(DC3.7V)/充電端子Type-C・充電約1.5h/連続使用最大約15h/2.5mmイヤホンジャック/Bluetooth5.0/重量21.6g(本体のみ)/IPX3/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×37×12.5mm(クリップ部除く)",
       connect: "Buddycom対応/iOS・Android対応",
       includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
     { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P3NL", alias: "SSW-1010NL", name: "ワイヤレスタイピンマイク(Buddycomロゴなし)", img: "images/products/MKI-P3NL.jpg",
       desc: "MKI-P3のBuddycomロゴなし仕様。機能・仕様はMKI-P3と共通です。",
-      features: ["NL=Buddycomロゴなし仕様", "PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替/PTTボタンモード/LED消灯モード", "ミュート機能"],
+      features: ["NL=Buddycomロゴなし仕様", "PTT・MF・F1〜F3の5ボタン搭載", "外部マイク切替(MF+F3)＝イヤホンジャックに接続した外部マイクにマイク機能のみ切替(本体でのPTT操作は可能)", "PTTボタンモード(MF+F1)＝本体マイクが効かない状態になり、PTTボタン操作のみ", "LED消灯モード(MF+F2)＝電源ON後に周期点灯するLEDを消灯(アミューズメントパークなど暗がりで目立たせたくない場面に)", "ミュート機能"],
       specs: "バッテリー240mAh(DC3.7V)/充電端子Type-C・充電約1.5h/連続使用最大約15h/2.5mmイヤホンジャック/Bluetooth5.0/重量21.6g(本体のみ)/IPX3/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×37×12.5mm(クリップ部除く)",
       connect: "Buddycom対応/iOS・Android対応",
       includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
-    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6", alias: "SSW-1090", name: "ワイヤレスタイピンマイク(接話型)", img: "images/products/MKI-P6.jpg",
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6", alias: "SSW-1090", name: "ワイヤレスタイピンマイク(接話型・Buddycomロゴあり)", img: "images/products/MKI-P6.jpg",
       desc: "双指向性ノイズキャンセル搭載の接話型Bluetoothタイピンマイク。騒音環境での音声認識に強いモデルです。",
-      features: ["双指向性ノイズキャンセル(接話型)", "ファンクションボタン搭載", "シリコンケース装着済み"],
+      features: ["双指向性ノイズキャンセル(接話型)", "PTT・MF・F1〜F3の5ボタン搭載"],
       specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×38×13.5mm(クリップ部除く)",
       connect: "Buddycom対応/iOS・Android対応",
       includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
-    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6NL", alias: "SSW-1090NL", name: "ワイヤレスタイピンマイク(接話型・ロゴなし)", img: "images/products/MKI-P6NL.jpg",
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6NL", alias: "SSW-1090NL", name: "ワイヤレスタイピンマイク(接話型・Buddycomロゴなし)", img: "images/products/MKI-P6NL.jpg",
       desc: "MKI-P6のBuddycomロゴなし仕様。機能・仕様はMKI-P6と共通です。",
-      features: ["NL=Buddycomロゴなし仕様", "双指向性ノイズキャンセル(接話型)", "ファンクションボタン搭載"],
+      features: ["NL=Buddycomロゴなし仕様", "双指向性ノイズキャンセル(接話型)", "PTT・MF・F1〜F3の5ボタン搭載"],
       specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体49×38×13.5mm(クリップ部除く)",
       connect: "Buddycom対応/iOS・Android対応",
       includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
-    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6MG", alias: "SSW-1090MG", name: "ワイヤレスタイピンマイク(マグネット)", img: "images/products/MKI-P6MG.jpg",
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P6MG", alias: "SSW-1090MG", name: "ワイヤレスタイピンマイク(マグネット・Buddycomロゴあり)", img: "images/products/MKI-P6MG.jpg",
       desc: "マグネット(磁石)クリップ仕様。制服を傷めずに装着でき、胸元での発話でもしっかり声を拾います。",
-      features: ["マグネット(磁石)クリップ仕様", "双指向性ノイズキャンセル", "双指向性マイクながら単一指向性のように胸元発話でも音を拾う調整", "ファンクションボタン搭載"],
+      features: ["マグネット(磁石)クリップ仕様", "双指向性ノイズキャンセル", "双指向性マイクながら単一指向性のように胸元発話でも音を拾う調整", "PTT・MF・F1〜F3の5ボタン搭載"],
       specs: "Bluetooth5.0/連続使用最大約15h/充電約1.5h/重量24g(本体のみ)/IPX3/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃",
       connect: "Buddycom対応/iOS・Android対応",
       includes: "Type-Cケーブル/クイックスタートガイド/シリコンケース(装着済み)" },
-    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P7", alias: "SSW-1060", name: "ワイヤレス小型タイピンマイク", img: "images/products/MKI-P7.jpg",
+    { cat: "ワイヤレスマイク(Bluetooth)", model: "MKI-P7", alias: "SSW-1060", name: "ワイヤレス小型タイピンマイク", img: "images/products/MKI-P7.jpg", imgSmall: true,
       desc: "約15gと軽量・小型のシンプルなBluetoothタイピンマイク。小型ながらバッテリーは12時間持続します。",
       features: ["約15gの軽量・小型ボディ", "シンプル操作", "ミュート機能"],
       specs: "Bluetooth5.0/連続使用最大約12h/充電約1.5h/重量15g(本体のみ)/2.5mmイヤホンジャック・USB-C充電端子/対応プロファイルHFP・HSP・GATT・A2DP/動作環境温度-10〜50℃/本体39×31×14mm(クリップ部除く)",
@@ -1060,7 +1062,7 @@
       card.className = "prod-card";
       if (p.img) {
         var im = document.createElement("img");
-        im.className = "prod-img";
+        im.className = "prod-img" + (p.imgSmall ? " prod-img-sm" : "");
         im.src = p.img;
         im.alt = p.model + " " + (p.name || "");
         im.loading = "lazy";
