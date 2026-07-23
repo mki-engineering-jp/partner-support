@@ -187,6 +187,18 @@
   .notice-date { font-size: 0.72rem; color: #4A6E80; }
   .notice-title { font-size: 0.88rem; font-weight: 700; margin: 2px 0; }
   .notice-body { font-size: 0.82rem; color: #345A6C; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+  .notice-like-row { margin-top: 6px; }
+  .like-btn {
+    border: 1.5px solid var(--line); background: var(--white); color: #4A6E80;
+    border-radius: 999px; padding: 4px 13px;
+    font-size: 0.75rem; font-weight: 700; font-family: inherit;
+    cursor: pointer; transition: background .12s, color .12s, border-color .12s;
+  }
+  .like-btn:hover:not(:disabled) { background: var(--mist); }
+  .like-btn.liked {
+    background: var(--mist); border-color: var(--sky); color: var(--sky);
+  }
+  .like-btn:disabled { opacity: 0.6; cursor: default; }
 
   /* ── 質問・要望BOX ───────────────────────── */
   #qbox-view { display: none; }
@@ -690,35 +702,73 @@
   // ── 管理者からのお知らせ ─────────────────────
   function loadNotices() {
     noticesLoaded = true;
-    sb.from("portal_notices")
-      .select("id, title, body, created_at")
-      .eq("portal", "science_arts")
-      .eq("published", true)
-      .order("created_at", { ascending: false })
-      .limit(5)
-      .then(function (res) {
-        if (res.error || !res.data || res.data.length === 0) return;
-        var list = $("notices-list");
-        list.innerHTML = "";
-        res.data.forEach(function (n) {
-          var item = document.createElement("div");
-          item.className = "notice-item";
-          var d = document.createElement("div");
-          d.className = "notice-date";
-          d.textContent = n.created_at ? String(n.created_at).slice(0, 10).replace(/-/g, "/") : "";
-          var t = document.createElement("div");
-          t.className = "notice-title";
-          t.textContent = n.title || "";
-          var b = document.createElement("div");
-          b.className = "notice-body";
-          b.textContent = n.body || "";
-          item.appendChild(d);
-          item.appendChild(t);
-          if (n.body) item.appendChild(b);
-          list.appendChild(item);
-        });
-        $("notices-box").style.display = "block";
+    Promise.all([
+      sb.from("portal_notices")
+        .select("id, title, body, created_at")
+        .eq("portal", "science_arts")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(5),
+      sb.rpc("notice_like_counts"),
+      sb.from("notice_reactions").select("notice_id")
+    ]).then(function (results) {
+      var res = results[0];
+      if (res.error || !res.data || res.data.length === 0) return;
+      var counts = {};
+      (results[1].data || []).forEach(function (r) { counts[r.notice_id] = Number(r.likes) || 0; });
+      var mine = {};
+      (results[2].data || []).forEach(function (r) { mine[r.notice_id] = true; });
+
+      var list = $("notices-list");
+      list.innerHTML = "";
+      res.data.forEach(function (n) {
+        var item = document.createElement("div");
+        item.className = "notice-item";
+        var d = document.createElement("div");
+        d.className = "notice-date";
+        d.textContent = n.created_at ? String(n.created_at).slice(0, 10).replace(/-/g, "/") : "";
+        var t = document.createElement("div");
+        t.className = "notice-title";
+        t.textContent = n.title || "";
+        var b = document.createElement("div");
+        b.className = "notice-body";
+        b.textContent = n.body || "";
+        item.appendChild(d);
+        item.appendChild(t);
+        if (n.body) item.appendChild(b);
+        item.appendChild(buildLikeRow(n.id, counts[n.id] || 0, !!mine[n.id]));
+        list.appendChild(item);
       });
+      $("notices-box").style.display = "block";
+    });
+  }
+
+  // いいねボタン(押すと追加・もう一度押すと取り消し)
+  function buildLikeRow(noticeId, count, liked) {
+    var row = document.createElement("div");
+    row.className = "notice-like-row";
+    var btn = document.createElement("button");
+    btn.type = "button";
+    function paint() {
+      btn.className = "like-btn" + (liked ? " liked" : "");
+      btn.textContent = "👍 いいね" + (count > 0 ? " " + count : "");
+    }
+    paint();
+    btn.addEventListener("click", function () {
+      btn.disabled = true;
+      var q = liked
+        ? sb.from("notice_reactions").delete().eq("notice_id", noticeId)
+        : sb.from("notice_reactions").insert({ notice_id: noticeId });
+      q.then(function (res) {
+        btn.disabled = false;
+        if (res.error) return;
+        liked = !liked;
+        count = Math.max(0, count + (liked ? 1 : -1));
+        paint();
+      });
+    });
+    row.appendChild(btn);
+    return row;
   }
 
   // ── 質問・要望BOX ────────────────────────────

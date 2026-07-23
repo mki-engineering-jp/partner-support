@@ -352,25 +352,31 @@
     return iso ? String(iso).slice(0, 10).replace(/-/g, "/") : "";
   }
 
+  var likeCounts = {};
   function loadNotices() {
     var wrap = $("notices-list");
     wrap.innerHTML = "<p class=\"list-status\">読み込み中…</p>";
-    sb.from("portal_notices")
-      .select("id, title, body, published, created_at")
-      .eq("portal", PORTAL)
-      .order("created_at", { ascending: false })
-      .then(function (res) {
-        if (res.error) {
-          wrap.innerHTML = "<p class=\"list-status err\">読み込みに失敗しました。再ログインしてお試しください。</p>";
-          return;
-        }
-        if (!res.data || res.data.length === 0) {
-          wrap.innerHTML = "<p class=\"list-status\">まだお知らせはありません。</p>";
-          return;
-        }
-        wrap.innerHTML = "";
-        res.data.forEach(function (n) { wrap.appendChild(renderItem(n)); });
-      });
+    Promise.all([
+      sb.from("portal_notices")
+        .select("id, title, body, published, created_at")
+        .eq("portal", PORTAL)
+        .order("created_at", { ascending: false }),
+      sb.rpc("notice_like_counts")
+    ]).then(function (results) {
+      var res = results[0];
+      likeCounts = {};
+      (results[1].data || []).forEach(function (r) { likeCounts[r.notice_id] = Number(r.likes) || 0; });
+      if (res.error) {
+        wrap.innerHTML = "<p class=\"list-status err\">読み込みに失敗しました。再ログインしてお試しください。</p>";
+        return;
+      }
+      if (!res.data || res.data.length === 0) {
+        wrap.innerHTML = "<p class=\"list-status\">まだお知らせはありません。</p>";
+        return;
+      }
+      wrap.innerHTML = "";
+      res.data.forEach(function (n) { wrap.appendChild(renderItem(n)); });
+    });
   }
 
   function renderItem(n) {
@@ -386,6 +392,9 @@
     date.textContent = fmtDate(n.created_at);
     meta.appendChild(badge);
     meta.appendChild(date);
+    var likes = document.createElement("span");
+    likes.textContent = "👍 " + (likeCounts[n.id] || 0);
+    meta.appendChild(likes);
 
     var title = document.createElement("div");
     title.className = "n-title";
