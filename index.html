@@ -585,7 +585,7 @@
     <div class="notice">
       <b>製品ラインナップ</b><br>
       ・仕様の詳細や使い方は「AIに質問する」からご確認いただけます<br>
-      ・価格・納期は sales@miki-kk.jp へお問い合わせください
+      ・価格・納期は、メール（sales@miki-kk.jp）もしくはSlackでお問い合わせください
     </div>
     <div id="prod-cat-chips"></div>
     <div id="products-list"></div>
@@ -1048,13 +1048,13 @@
     title.textContent = "金額や会社名などを含むご質問のようです";
     var sub = document.createElement("div");
     sub.className = "handoff-sub";
-    sub.textContent = "このような内容は、AIを通さず担当者へ直接お送りいただけます。担当者からご登録のメールアドレス宛に回答いたします。";
+    sub.textContent = "このような内容は、AIを通さず担当者のSlackへ直接お送りいただけます。担当者からSlackもしくはメールでご回答いたします。";
 
     var actions = document.createElement("div");
     actions.className = "handoff-actions";
     var directBtn = document.createElement("button");
     directBtn.className = "handoff-send";
-    directBtn.textContent = "担当者へ直接転送する";
+    directBtn.textContent = "Slackへ直接転送する";
     var aiBtn = document.createElement("button");
     aiBtn.className = "handoff-cancel";
     aiBtn.textContent = "このままAIに質問する";
