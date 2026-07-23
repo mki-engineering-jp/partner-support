@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<title>管理者ページ | 営業サポートポータル | 幹開発株式会社</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #2E9FD8;
+    --aqua: #35C4B5;
+    --deep: #0F3A4D;
+    --mist: #EAF6FC;
+    --white: #FFFFFF;
+    --line: #D3E9F4;
+    --radius: 18px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Noto Sans JP", sans-serif;
+    color: var(--deep);
+    background: linear-gradient(165deg, #F4FBFF 0%, var(--mist) 55%, #E3F7F3 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  h1, h2, .brand { font-family: "Zen Maru Gothic", sans-serif; }
+
+  header {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff;
+    padding: 18px 20px 30px;
+    position: relative;
+  }
+  header .inner {
+    max-width: 860px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  }
+  .brand { font-size: 1.15rem; font-weight: 700; letter-spacing: 0.04em; }
+  .brand small { display: block; font-size: 0.7rem; font-weight: 500; opacity: 0.9; letter-spacing: 0.12em; margin-top: 2px; }
+  header .wave {
+    position: absolute; left: 0; right: 0; bottom: -1px; height: 22px; width: 100%; display: block;
+  }
+  #logout-btn {
+    display: none;
+    background: rgba(255,255,255,0.22); color: #fff;
+    border: 1px solid rgba(255,255,255,0.6);
+    border-radius: 999px; padding: 7px 16px;
+    font-size: 0.8rem; cursor: pointer; font-family: inherit;
+  }
+  #logout-btn:hover { background: rgba(255,255,255,0.35); }
+
+  main { flex: 1; width: 100%; max-width: 860px; margin: 0 auto; padding: 26px 16px 40px; }
+
+  #login-view {
+    max-width: 430px; margin: 6vh auto 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 32px rgba(46,159,216,0.14);
+    padding: 34px 30px 30px;
+  }
+  #login-view h1 { font-size: 1.25rem; margin-bottom: 6px; }
+  #login-view .lead { font-size: 0.85rem; color: #4A6E80; margin-bottom: 22px; line-height: 1.7; }
+  label { display: block; font-size: 0.8rem; font-weight: 700; margin-bottom: 6px; }
+  input[type="email"], input[type="text"] {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    font-size: 1rem; font-family: inherit; color: var(--deep);
+    background: #FBFEFF; outline: none;
+    transition: border-color .15s;
+  }
+  input:focus, textarea:focus { border-color: var(--sky); }
+  .btn {
+    width: 100%; margin-top: 16px; padding: 13px;
+    border: none; border-radius: 999px;
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; font-size: 0.95rem; font-weight: 700; font-family: "Zen Maru Gothic", sans-serif;
+    letter-spacing: 0.06em; cursor: pointer;
+    box-shadow: 0 6px 16px rgba(46,159,216,0.3);
+    transition: transform .12s, box-shadow .12s;
+  }
+  .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(46,159,216,0.38); }
+  .btn:disabled { opacity: 0.55; cursor: default; }
+  .btn.ghost {
+    background: none; color: var(--sky);
+    box-shadow: none; border: 1.5px solid var(--line); margin-top: 10px;
+  }
+  .login-msg { margin-top: 14px; font-size: 0.83rem; line-height: 1.6; min-height: 1.2em; }
+  .login-msg.ok { color: #0E8A6C; }
+  .login-msg.err { color: #C7483B; }
+  #step-code { display: none; }
+  .code-note { font-size: 0.78rem; color: #4A6E80; margin-top: 8px; line-height: 1.7; }
+
+  #admin-view { display: none; }
+  #denied-view {
+    display: none;
+    max-width: 430px; margin: 6vh auto 0;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+    padding: 34px 30px;
+    text-align: center;
+    font-size: 0.9rem; line-height: 1.9;
+  }
+  .notice {
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 12px 16px; font-size: 0.78rem; color: #4A6E80; line-height: 1.8; margin-bottom: 16px;
+  }
+  .notice b { color: var(--deep); }
+
+  .card {
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px; margin-bottom: 18px;
+  }
+  .card h2 { font-size: 1rem; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+  .card h2::before {
+    content: ""; width: 6px; height: 20px; border-radius: 3px;
+    background: linear-gradient(180deg, var(--sky), var(--aqua));
+  }
+  .card label { margin-top: 12px; }
+  .card label:first-of-type { margin-top: 0; }
+  .card textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    font-size: 0.95rem; font-family: inherit; color: var(--deep);
+    background: #FBFEFF; outline: none; resize: vertical;
+    transition: border-color .15s;
+  }
+  .form-msg { margin-top: 10px; font-size: 0.83rem; min-height: 1.2em; }
+  .form-msg.ok { color: #0E8A6C; }
+  .form-msg.err { color: #C7483B; }
+  .form-actions { display: flex; gap: 10px; }
+  .form-actions .btn { flex: 1; }
+
+  .n-item { border-top: 1px dashed var(--line); padding: 14px 2px; }
+  .n-item:first-of-type { border-top: none; padding-top: 4px; }
+  .n-meta { font-size: 0.72rem; color: #4A6E80; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .n-badge {
+    display: inline-block; font-size: 0.68rem; font-weight: 700;
+    border-radius: 999px; padding: 2px 10px;
+  }
+  .n-badge.pub { background: #E3F7EF; color: #0E8A6C; }
+  .n-badge.hidden { background: #F1F1F1; color: #777; }
+  .n-title { font-size: 0.92rem; font-weight: 700; margin: 4px 0 2px; }
+  .n-body { font-size: 0.83rem; color: #345A6C; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+  .n-actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .mini-btn {
+    border: 1.5px solid var(--line); background: var(--white); color: var(--deep);
+    border-radius: 999px; padding: 6px 14px; font-size: 0.78rem; font-weight: 700;
+    font-family: inherit; cursor: pointer;
+  }
+  .mini-btn:hover { background: var(--mist); }
+  .mini-btn.danger { color: #C7483B; border-color: #F0D2CE; }
+  .mini-btn.danger:hover { background: #FDEDEB; }
+  .list-status { font-size: 0.85rem; color: #4A6E80; padding: 6px 2px; }
+  .list-status.err { color: #C7483B; }
+
+  footer { text-align: center; font-size: 0.72rem; color: #4A6E80; padding: 18px 10px 26px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="inner">
+    <div class="brand">営業サポートポータル 管理者ページ<small>MKI ENGINEERING / ADMIN</small></div>
+    <button id="logout-btn">ログアウト</button>
+  </div>
+  <svg class="wave" viewBox="0 0 1200 24" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,12 C150,26 300,-2 450,10 C600,22 750,0 900,12 C1050,24 1150,6 1200,12 L1200,24 L0,24 Z"
+          fill="#F4FBFF"></path>
+  </svg>
+</header>
+
+<main>
+  <!-- ログイン -->
+  <div id="login-view">
+    <h1>管理者ログイン</h1>
+    <p class="lead">管理者として登録されたメールアドレスに認証コードをお送りします。</p>
+
+    <div id="step-email">
+      <label for="email-input">メールアドレス</label>
+      <input type="email" id="email-input" placeholder="admin@example.co.jp" autocomplete="email">
+      <button class="btn" id="send-code-btn">認証コードを送信</button>
+    </div>
+
+    <div id="step-code">
+      <label for="code-input">認証コード(6桁)</label>
+      <input type="text" id="code-input" inputmode="numeric" maxlength="6" placeholder="123456" autocomplete="one-time-code">
+      <button class="btn" id="verify-btn">ログイン</button>
+      <button class="btn ghost" id="back-btn">メールアドレスをやり直す</button>
+      <p class="code-note">メールが届かない場合は迷惑メールフォルダをご確認ください。送信元: noreply@miki-kk.jp</p>
+    </div>
+
+    <p class="login-msg" id="login-msg"></p>
+  </div>
+
+  <!-- 権限なし -->
+  <div id="denied-view">
+    <b>管理者権限がありません</b><br>
+    このメールアドレスは管理者として登録されていません。<br>
+    管理者の追加はシステム担当までご連絡ください。
+  </div>
+
+  <!-- 管理画面 -->
+  <div id="admin-view">
+    <div class="notice">
+      <b>お知らせ管理</b><br>
+      ・ここで投稿したお知らせは、ポータルにログインした営業担当者全員の画面上部に表示されます（新しい順・最大5件）<br>
+      ・「非公開」にするとポータルには表示されません。過去のお知らせは非公開にしておくことをおすすめします<br>
+      ・営業担当者からの質問・要望は、これまで通りSlackに通知されます
+    </div>
+
+    <div class="card">
+      <h2 id="form-title">新しいお知らせを投稿</h2>
+      <label for="notice-title">タイトル</label>
+      <input type="text" id="notice-title" placeholder="例: 新製品MKI-P1S1の資料を追加しました">
+      <label for="notice-body">本文（任意）</label>
+      <textarea id="notice-body" rows="4" placeholder="例: 製品ページに有線4つボタンマイク MKI-P1S1 を追加しました。あわせてセールストークもご確認ください。"></textarea>
+      <div class="form-actions">
+        <button class="btn" id="notice-save-btn">投稿する</button>
+        <button class="btn ghost" id="notice-cancel-btn" style="display:none;">編集をやめる</button>
+      </div>
+      <p class="form-msg" id="form-msg"></p>
+    </div>
+
+    <div class="card">
+      <h2>投稿済みのお知らせ</h2>
+      <div id="notices-list"><p class="list-status">読み込み中…</p></div>
+    </div>
+  </div>
+</main>
+
+<footer>© 幹開発株式会社 MKI Engineering Co., Ltd.</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+  var SUPABASE_URL = "https://adatzeolzkjujtuxebrc.supabase.co";
+  var SUPABASE_KEY = "sb_publishable_2Ghe-V3dLS7Ym06p71i33A_zFU8eJgz";
+  var PORTAL = "science_arts";
+
+  var sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  var pendingEmail = "";
+  var editingId = null;   // 編集中のお知らせID(nullなら新規投稿)
+
+  function $(id) { return document.getElementById(id); }
+
+  // ── 画面切り替え ─────────────────────────────
+  function showLogin() {
+    $("login-view").style.display = "block";
+    $("admin-view").style.display = "none";
+    $("denied-view").style.display = "none";
+    $("logout-btn").style.display = "none";
+    $("step-email").style.display = "block";
+    $("step-code").style.display = "none";
+  }
+  function showDenied() {
+    $("login-view").style.display = "none";
+    $("admin-view").style.display = "none";
+    $("denied-view").style.display = "block";
+    $("logout-btn").style.display = "inline-block";
+  }
+  function showAdmin() {
+    $("login-view").style.display = "none";
+    $("denied-view").style.display = "none";
+    $("admin-view").style.display = "block";
+    $("logout-btn").style.display = "inline-block";
+    loadNotices();
+  }
+
+  // ── 管理者チェック → 画面表示 ─────────────────
+  function enter() {
+    sb.rpc("is_portal_admin").then(function (res) {
+      if (res.error) {
+        // 関数未作成などの場合も権限なし扱い
+        showDenied();
+        return;
+      }
+      if (res.data === true) showAdmin();
+      else showDenied();
+    });
+  }
+
+  sb.auth.getSession().then(function (res) {
+    if (res.data && res.data.session) enter();
+  });
+
+  // ── ログイン(OTP) ────────────────────────────
+  function showLoginMsg(text, cls) {
+    var el = $("login-msg");
+    el.textContent = text;
+    el.className = "login-msg" + (cls ? " " + cls : "");
+  }
+  function setBusy(id, busy, label) {
+    var b = $(id);
+    b.disabled = busy;
+    b.textContent = label;
+  }
+
+  $("send-code-btn").addEventListener("click", function () {
+    var email = $("email-input").value.trim().toLowerCase();
+    if (!email || email.indexOf("@") < 0) {
+      return showLoginMsg("メールアドレスを入力してください", "err");
+    }
+    setBusy("send-code-btn", true, "送信中…");
+    sb.auth.signInWithOtp({ email: email, options: { shouldCreateUser: true } })
+      .then(function (res) {
+        setBusy("send-code-btn", false, "認証コードを送信");
+        if (res.error) {
+          showLoginMsg("送信に失敗しました。時間を置いてお試しください。", "err");
+        } else {
+          pendingEmail = email;
+          $("step-email").style.display = "none";
+          $("step-code").style.display = "block";
+          showLoginMsg("認証コードをメールで送信しました。", "ok");
+          $("code-input").focus();
+        }
+      });
+  });
+
+  $("verify-btn").addEventListener("click", function () {
+    var code = $("code-input").value.trim();
+    if (code.length < 6) return showLoginMsg("6桁のコードを入力してください", "err");
+    setBusy("verify-btn", true, "確認中…");
+    sb.auth.verifyOtp({ email: pendingEmail, token: code, type: "email" })
+      .then(function (res) {
+        setBusy("verify-btn", false, "ログイン");
+        if (res.error) {
+          showLoginMsg("コードが正しくないか、有効期限が切れています。", "err");
+        } else {
+          showLoginMsg("", "");
+          enter();
+        }
+      });
+  });
+
+  $("back-btn").addEventListener("click", function () {
+    $("step-code").style.display = "none";
+    $("step-email").style.display = "block";
+    showLoginMsg("", "");
+  });
+
+  $("logout-btn").addEventListener("click", function () {
+    sb.auth.signOut().then(function () { showLogin(); });
+  });
+
+  // ── お知らせ一覧 ─────────────────────────────
+  function fmtDate(iso) {
+    return iso ? String(iso).slice(0, 10).replace(/-/g, "/") : "";
+  }
+
+  function loadNotices() {
+    var wrap = $("notices-list");
+    wrap.innerHTML = "<p class=\"list-status\">読み込み中…</p>";
+    sb.from("portal_notices")
+      .select("id, title, body, published, created_at")
+      .eq("portal", PORTAL)
+      .order("created_at", { ascending: false })
+      .then(function (res) {
+        if (res.error) {
+          wrap.innerHTML = "<p class=\"list-status err\">読み込みに失敗しました。再ログインしてお試しください。</p>";
+          return;
+        }
+        if (!res.data || res.data.length === 0) {
+          wrap.innerHTML = "<p class=\"list-status\">まだお知らせはありません。</p>";
+          return;
+        }
+        wrap.innerHTML = "";
+        res.data.forEach(function (n) { wrap.appendChild(renderItem(n)); });
+      });
+  }
+
+  function renderItem(n) {
+    var item = document.createElement("div");
+    item.className = "n-item";
+
+    var meta = document.createElement("div");
+    meta.className = "n-meta";
+    var badge = document.createElement("span");
+    badge.className = "n-badge " + (n.published ? "pub" : "hidden");
+    badge.textContent = n.published ? "公開中" : "非公開";
+    var date = document.createElement("span");
+    date.textContent = fmtDate(n.created_at);
+    meta.appendChild(badge);
+    meta.appendChild(date);
+
+    var title = document.createElement("div");
+    title.className = "n-title";
+    title.textContent = n.title || "";
+    var body = document.createElement("div");
+    body.className = "n-body";
+    body.textContent = n.body || "";
+
+    var actions = document.createElement("div");
+    actions.className = "n-actions";
+
+    var toggleBtn = document.createElement("button");
+    toggleBtn.className = "mini-btn";
+    toggleBtn.textContent = n.published ? "非公開にする" : "公開する";
+    toggleBtn.addEventListener("click", function () {
+      toggleBtn.disabled = true;
+      sb.from("portal_notices")
+        .update({ published: !n.published, updated_at: new Date().toISOString() })
+        .eq("id", n.id)
+        .then(function (res) {
+          if (res.error) { toggleBtn.disabled = false; alertMsg("更新に失敗しました。", "err"); return; }
+          loadNotices();
+        });
+    });
+
+    var editBtn = document.createElement("button");
+    editBtn.className = "mini-btn";
+    editBtn.textContent = "編集";
+    editBtn.addEventListener("click", function () {
+      editingId = n.id;
+      $("notice-title").value = n.title || "";
+      $("notice-body").value = n.body || "";
+      $("form-title").textContent = "お知らせを編集";
+      $("notice-save-btn").textContent = "更新する";
+      $("notice-cancel-btn").style.display = "block";
+      alertMsg("", "");
+      $("notice-title").focus();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    var delBtn = document.createElement("button");
+    delBtn.className = "mini-btn danger";
+    delBtn.textContent = "削除";
+    delBtn.addEventListener("click", function () {
+      if (delBtn.getAttribute("data-confirm") !== "1") {
+        delBtn.setAttribute("data-confirm", "1");
+        delBtn.textContent = "本当に削除する";
+        setTimeout(function () {
+          delBtn.setAttribute("data-confirm", "0");
+          delBtn.textContent = "削除";
+        }, 4000);
+        return;
+      }
+      delBtn.disabled = true;
+      sb.from("portal_notices")
+        .delete()
+        .eq("id", n.id)
+        .then(function (res) {
+          if (res.error) { delBtn.disabled = false; alertMsg("削除に失敗しました。", "err"); return; }
+          if (editingId === n.id) resetForm();
+          loadNotices();
+        });
+    });
+
+    actions.appendChild(toggleBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(delBtn);
+
+    item.appendChild(meta);
+    item.appendChild(title);
+    if (n.body) item.appendChild(body);
+    item.appendChild(actions);
+    return item;
+  }
+
+  // ── 投稿・編集フォーム ───────────────────────
+  function alertMsg(text, cls) {
+    var el = $("form-msg");
+    el.textContent = text;
+    el.className = "form-msg" + (cls ? " " + cls : "");
+  }
+  function resetForm() {
+    editingId = null;
+    $("notice-title").value = "";
+    $("notice-body").value = "";
+    $("form-title").textContent = "新しいお知らせを投稿";
+    $("notice-save-btn").textContent = "投稿する";
+    $("notice-cancel-btn").style.display = "none";
+  }
+
+  $("notice-cancel-btn").addEventListener("click", function () {
+    resetForm();
+    alertMsg("", "");
+  });
+
+  $("notice-save-btn").addEventListener("click", function () {
+    var title = $("notice-title").value.trim();
+    var body = $("notice-body").value.trim();
+    if (!title) {
+      alertMsg("タイトルを入力してください。", "err");
+      $("notice-title").focus();
+      return;
+    }
+    var btn = $("notice-save-btn");
+    btn.disabled = true;
+    var q;
+    if (editingId === null) {
+      q = sb.from("portal_notices").insert({ portal: PORTAL, title: title, body: body, published: true });
+    } else {
+      q = sb.from("portal_notices")
+        .update({ title: title, body: body, updated_at: new Date().toISOString() })
+        .eq("id", editingId);
+    }
+    q.then(function (res) {
+      btn.disabled = false;
+      if (res.error) {
+        alertMsg("保存に失敗しました。管理者権限があるかご確認ください。", "err");
+        return;
+      }
+      var wasEdit = editingId !== null;
+      resetForm();
+      alertMsg(wasEdit ? "更新しました。" : "投稿しました。ポータルのお知らせ欄に表示されます。", "ok");
+      loadNotices();
+    });
+  });
+</script>
+</body>
+</html>

@@ -166,6 +166,48 @@
   }
   .tab-btn:not(.active):hover { background: var(--mist); }
 
+  /* ── お知らせ(管理者からのお知らせ) ─────────── */
+  #notices-box {
+    display: none;
+    background: var(--white);
+    border: 1px solid var(--line);
+    border-left: 6px solid var(--aqua);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    margin-bottom: 16px;
+  }
+  .notices-head {
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 0.9rem; font-weight: 700;
+    display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+  }
+  .notices-head::before { content: "📢"; }
+  .notice-item { padding: 8px 0; border-top: 1px dashed var(--line); }
+  .notice-item:first-of-type { border-top: none; }
+  .notice-date { font-size: 0.72rem; color: #4A6E80; }
+  .notice-title { font-size: 0.88rem; font-weight: 700; margin: 2px 0; }
+  .notice-body { font-size: 0.82rem; color: #345A6C; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
+
+  /* ── 質問・要望BOX ───────────────────────── */
+  #qbox-view { display: none; }
+  .qbox-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 22px 22px 24px;
+  }
+  .qbox-card label { margin-top: 14px; }
+  .qbox-card label:first-of-type { margin-top: 0; }
+  .qbox-card textarea {
+    width: 100%; padding: 12px 14px;
+    border: 1.5px solid var(--line); border-radius: 12px;
+    font-size: 0.95rem; font-family: inherit; color: var(--deep);
+    background: #FBFEFF; outline: none; resize: vertical;
+    transition: border-color .15s;
+  }
+  .qbox-card textarea:focus { border-color: var(--sky); }
+  .qbox-msg { margin-top: 12px; font-size: 0.85rem; line-height: 1.7; min-height: 1.2em; }
+  .qbox-msg.ok { color: #0E8A6C; }
+  .qbox-msg.err { color: #C7483B; }
+
   /* ── 製品ページ ─────────────────────────── */
   #products-view { display: none; }
   .prod-cat-title {
@@ -382,6 +424,8 @@
     #messages { height: 58vh; }
     .bubble { max-width: 90%; }
     #login-view { padding: 28px 20px 24px; }
+    #portal-tabs { flex-wrap: wrap; border-radius: 22px; }
+    .tab-btn { flex: 1 1 30%; font-size: 0.8rem; padding: 9px 4px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
@@ -430,7 +474,14 @@
     <button class="tab-btn" data-tab="products-view">製品ページ</button>
     <button class="tab-btn" data-tab="talks-view">セールストーク</button>
     <button class="tab-btn" data-tab="kikikurabe-view">聞き比べ</button>
+    <button class="tab-btn" data-tab="qbox-view">質問・要望</button>
   </nav>
+
+  <!-- 管理者からのお知らせ(ログイン後・全タブ共通で表示) -->
+  <div id="notices-box" aria-label="管理者からのお知らせ">
+    <div class="notices-head">お知らせ</div>
+    <div id="notices-list"></div>
+  </div>
 
   <!-- チャット -->
   <div id="chat-view">
@@ -489,6 +540,24 @@
     </div>
     <div id="talks-list"><p class="talk-status">読み込み中…</p></div>
   </div>
+
+  <!-- 質問・要望BOX -->
+  <div id="qbox-view">
+    <div class="notice">
+      <b>質問・要望BOX</b><br>
+      ・「このツールに載せてほしい情報」「あると便利な資料」などのご要望や、ツールへのご質問をお送りください<br>
+      ・内容は担当者へ通知され、必要に応じてご登録のメールアドレス宛にご連絡いたします<br>
+      ・お客様名などの個人情報は入力しないでください
+    </div>
+    <div class="qbox-card">
+      <label for="qbox-text">ご質問・ご要望の内容</label>
+      <textarea id="qbox-text" rows="5" placeholder="例: 競合製品との比較表がほしい／設置事例の写真を増やしてほしい　など"></textarea>
+      <label for="qbox-note">補足・お急ぎの場合の連絡先など（任意）</label>
+      <textarea id="qbox-note" rows="2" placeholder="例: 来週の商談で使いたいので早めに対応いただけると助かります"></textarea>
+      <button class="btn" id="qbox-send-btn">送信する</button>
+      <p class="qbox-msg" id="qbox-msg"></p>
+    </div>
+  </div>
 </main>
 
 <footer>© 幹開発株式会社 MKI Engineering Co., Ltd.</footer>
@@ -515,8 +584,9 @@
   function $(id) { return document.getElementById(id); }
 
   // ── 画面切り替え ─────────────────────────────
-  var TAB_IDS = ["chat-view", "products-view", "talks-view", "kikikurabe-view"];
+  var TAB_IDS = ["chat-view", "products-view", "talks-view", "kikikurabe-view", "qbox-view"];
   var talksLoaded = false;
+  var noticesLoaded = false;
 
   function switchTab(tabId) {
     TAB_IDS.forEach(function (id) {
@@ -540,6 +610,7 @@
     switchTab("chat-view");
     renderProducts();
     renderProductChips();
+    if (!noticesLoaded) loadNotices();
     if ($("messages").childElementCount === 0) {
       $("quick-questions").style.display = "flex";
       addBubble("ai", "こんにちは。製品の使い方・セールスポイント・見積のご相談など、お気軽にご質問ください。");
@@ -553,7 +624,100 @@
     $("step-email").style.display = "block";
     $("step-code").style.display = "none";
     talksLoaded = false;
+    noticesLoaded = false;
+    $("notices-box").style.display = "none";
   }
+
+  // ── 管理者からのお知らせ ─────────────────────
+  function loadNotices() {
+    noticesLoaded = true;
+    sb.from("portal_notices")
+      .select("id, title, body, created_at")
+      .eq("portal", "science_arts")
+      .eq("published", true)
+      .order("created_at", { ascending: false })
+      .limit(5)
+      .then(function (res) {
+        if (res.error || !res.data || res.data.length === 0) return;
+        var list = $("notices-list");
+        list.innerHTML = "";
+        res.data.forEach(function (n) {
+          var item = document.createElement("div");
+          item.className = "notice-item";
+          var d = document.createElement("div");
+          d.className = "notice-date";
+          d.textContent = n.created_at ? String(n.created_at).slice(0, 10).replace(/-/g, "/") : "";
+          var t = document.createElement("div");
+          t.className = "notice-title";
+          t.textContent = n.title || "";
+          var b = document.createElement("div");
+          b.className = "notice-body";
+          b.textContent = n.body || "";
+          item.appendChild(d);
+          item.appendChild(t);
+          if (n.body) item.appendChild(b);
+          list.appendChild(item);
+        });
+        $("notices-box").style.display = "block";
+      });
+  }
+
+  // ── 質問・要望BOX ────────────────────────────
+  $("qbox-send-btn").addEventListener("click", function () {
+    var text = $("qbox-text").value.trim();
+    var note = $("qbox-note").value.trim();
+    var msg = $("qbox-msg");
+    if (!text) {
+      msg.className = "qbox-msg err";
+      msg.textContent = "ご質問・ご要望の内容を入力してください。";
+      $("qbox-text").focus();
+      return;
+    }
+    var btn = $("qbox-send-btn");
+    btn.disabled = true;
+    btn.textContent = "送信中…";
+    msg.className = "qbox-msg";
+    msg.textContent = "";
+    sb.auth.getSession().then(function (res) {
+      var session = res.data && res.data.session;
+      if (!session) { showLogin(); return; }
+      return fetch(HANDOFF_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + session.access_token,
+        },
+        body: JSON.stringify({
+          portal: "science_arts",
+          product: null,
+          question: "【営業ツール 質問・要望BOX】\n" + text,
+          answer: "",
+          note: note
+        })
+      });
+    }).then(function (resp) {
+      if (!resp) return null;
+      return resp.json().then(function (data) { return { ok: resp.ok, data: data }; });
+    }).then(function (r) {
+      btn.disabled = false;
+      btn.textContent = "送信する";
+      if (!r) return;
+      if (!r.ok || r.data.error) {
+        msg.className = "qbox-msg err";
+        msg.textContent = r.data.error || "送信に失敗しました。時間をおいて再度お試しください。";
+        return;
+      }
+      $("qbox-text").value = "";
+      $("qbox-note").value = "";
+      msg.className = "qbox-msg ok";
+      msg.textContent = "送信しました。ご意見ありがとうございます。担当者が内容を確認いたします。";
+    }).catch(function () {
+      btn.disabled = false;
+      btn.textContent = "送信する";
+      msg.className = "qbox-msg err";
+      msg.textContent = "通信エラーが発生しました。再度お試しください。";
+    });
+  });
 
   document.querySelectorAll(".tab-btn").forEach(function (btn) {
     btn.addEventListener("click", function () {
