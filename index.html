@@ -223,6 +223,20 @@
   .prod-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px;
   }
+  /* カテゴリ絞り込みチップ */
+  #prod-cat-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 4px; }
+  .cat-chip {
+    border: 1.5px solid var(--line); border-radius: 999px;
+    background: var(--white); color: var(--deep);
+    font-size: 0.8rem; font-weight: 700; font-family: inherit;
+    padding: 7px 14px; cursor: pointer;
+    transition: background .12s, color .12s;
+  }
+  .cat-chip.active {
+    background: linear-gradient(120deg, var(--sky), var(--aqua));
+    color: #fff; border-color: transparent;
+  }
+  .cat-chip:not(.active):hover { background: var(--mist); }
   .prod-card {
     background: var(--white);
     border: 1px solid var(--line); border-radius: var(--radius);
@@ -329,6 +343,31 @@
     content: ""; width: 6px; height: 20px; border-radius: 3px;
     background: linear-gradient(180deg, var(--aqua), var(--sky));
   }
+  /* カテゴリ折りたたみ(アコーディオン) */
+  .talk-cat-btn {
+    width: 100%; text-align: left;
+    display: flex; align-items: center; gap: 10px;
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 13px 16px; margin: 10px 0 0;
+    font-family: "Zen Maru Gothic", sans-serif;
+    font-size: 0.95rem; font-weight: 700; color: var(--deep);
+    cursor: pointer;
+    transition: background .12s;
+  }
+  .talk-cat-btn:hover { background: var(--mist); }
+  .talk-cat-btn::before {
+    content: ""; width: 6px; height: 20px; border-radius: 3px; flex-shrink: 0;
+    background: linear-gradient(180deg, var(--aqua), var(--sky));
+  }
+  .talk-cat-count {
+    font-family: "Noto Sans JP", sans-serif;
+    font-size: 0.72rem; font-weight: 700; color: var(--sky);
+    background: var(--mist); border-radius: 999px; padding: 2px 10px;
+  }
+  .talk-cat-arrow { margin-left: auto; color: #4A6E80; font-size: 0.8rem; transition: transform .15s; }
+  .talk-cat-btn.open .talk-cat-arrow { transform: rotate(180deg); }
+  .talk-cat-body { display: none; padding-top: 10px; }
+  .talk-cat-body.open { display: block; }
   .talk-card {
     background: var(--white);
     border: 1px solid var(--line); border-radius: var(--radius);
@@ -426,6 +465,25 @@
     #login-view { padding: 28px 20px 24px; }
     #portal-tabs { flex-wrap: wrap; border-radius: 22px; }
     .tab-btn { flex: 1 1 30%; font-size: 0.8rem; padding: 9px 4px; }
+    /* 製品カードを横型コンパクト表示(縦スクロール削減) */
+    .prod-card {
+      display: grid;
+      grid-template-columns: 96px 1fr;
+      column-gap: 12px; row-gap: 2px;
+      padding: 12px;
+      align-items: start;
+    }
+    .prod-img {
+      width: 96px; height: 96px;
+      grid-row: 1 / span 3;
+      padding: 5px; margin: 0;
+    }
+    .prod-img.prod-img-sm { padding: 16px; }
+    .prod-model { font-size: 0.95rem; grid-column: 2; }
+    .prod-alias { grid-column: 2; }
+    .prod-desc { font-size: 0.78rem; line-height: 1.6; grid-column: 2; }
+    .prod-detail-btn, .prod-detail, .prod-ask { grid-column: 1 / -1; }
+    .prod-ask { margin-top: 2px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { transition: none !important; }
@@ -517,6 +575,7 @@
       ・仕様の詳細や使い方は「AIに質問する」からご確認いただけます<br>
       ・価格・納期は sales@miki-kk.jp へお問い合わせください
     </div>
+    <div id="prod-cat-chips"></div>
     <div id="products-list"></div>
   </div>
 
@@ -1205,6 +1264,36 @@
   ];
 
   var productsRendered = false;
+  var catSections = {};   // カテゴリ名 → [見出しel, グリッドel]
+
+  function renderCatChips() {
+    var wrap = $("prod-cat-chips");
+    if (wrap.childElementCount > 0) return;
+    var cats = Object.keys(catSections);
+    var all = document.createElement("button");
+    all.className = "cat-chip active";
+    all.textContent = "すべて";
+    all.addEventListener("click", function () { filterCat(null, all); });
+    wrap.appendChild(all);
+    cats.forEach(function (c) {
+      var b = document.createElement("button");
+      b.className = "cat-chip";
+      b.textContent = c;
+      b.addEventListener("click", function () { filterCat(c, b); });
+      wrap.appendChild(b);
+    });
+  }
+  function filterCat(cat, btn) {
+    var chips = document.querySelectorAll(".cat-chip");
+    for (var i = 0; i < chips.length; i++) {
+      chips[i].className = "cat-chip" + (chips[i] === btn ? " active" : "");
+    }
+    Object.keys(catSections).forEach(function (c) {
+      var show = (cat === null || c === cat);
+      catSections[c].forEach(function (el) { el.style.display = show ? "" : "none"; });
+    });
+  }
+
   function renderProducts() {
     if (productsRendered) return;
     productsRendered = true;
@@ -1221,6 +1310,7 @@
         grid = document.createElement("div");
         grid.className = "prod-grid";
         wrap.appendChild(grid);
+        catSections[currentCat] = [t, grid];
       }
       var card = document.createElement("div");
       card.className = "prod-card";
@@ -1300,6 +1390,7 @@
       card.appendChild(btn);
       grid.appendChild(card);
     });
+    renderCatChips();
   }
 
   // ── セールストーク読み込み(要ログイン) ───────
@@ -1323,26 +1414,58 @@
           return;
         }
         wrap.innerHTML = "";
-        var currentCat = "";
+        // カテゴリごとにまとめて折りたたみ表示(縦スクロール削減)
+        var cats = [];
+        var byCat = {};
         rows.forEach(function (r) {
-          if (r.category !== currentCat) {
-            currentCat = r.category;
-            var t = document.createElement("h2");
-            t.className = "talk-cat-title";
-            t.textContent = currentCat;
-            wrap.appendChild(t);
+          var c = r.category || "その他";
+          if (!byCat[c]) { byCat[c] = []; cats.push(c); }
+          byCat[c].push(r);
+        });
+        cats.forEach(function (c, idx) {
+          var btn = document.createElement("button");
+          btn.className = "talk-cat-btn";
+          btn.type = "button";
+          var name = document.createElement("span");
+          name.textContent = c;
+          var count = document.createElement("span");
+          count.className = "talk-cat-count";
+          count.textContent = byCat[c].length + "件";
+          var arrow = document.createElement("span");
+          arrow.className = "talk-cat-arrow";
+          arrow.textContent = "▼";
+          btn.appendChild(name);
+          btn.appendChild(count);
+          btn.appendChild(arrow);
+
+          var bodyWrap = document.createElement("div");
+          bodyWrap.className = "talk-cat-body";
+          byCat[c].forEach(function (r) {
+            var card = document.createElement("div");
+            card.className = "talk-card";
+            if (r.title) {
+              var tt = document.createElement("div");
+              tt.className = "talk-title"; tt.textContent = r.title;
+              card.appendChild(tt);
+            }
+            var body = document.createElement("div");
+            body.className = "talk-body"; body.textContent = r.content || "";
+            card.appendChild(body);
+            bodyWrap.appendChild(card);
+          });
+
+          if (idx === 0) {
+            btn.className = "talk-cat-btn open";
+            bodyWrap.className = "talk-cat-body open";
           }
-          var card = document.createElement("div");
-          card.className = "talk-card";
-          if (r.title) {
-            var tt = document.createElement("div");
-            tt.className = "talk-title"; tt.textContent = r.title;
-            card.appendChild(tt);
-          }
-          var body = document.createElement("div");
-          body.className = "talk-body"; body.textContent = r.content || "";
-          card.appendChild(body);
-          wrap.appendChild(card);
+          btn.addEventListener("click", function () {
+            var open = bodyWrap.className.indexOf("open") >= 0;
+            bodyWrap.className = "talk-cat-body" + (open ? "" : " open");
+            btn.className = "talk-cat-btn" + (open ? "" : " open");
+          });
+
+          wrap.appendChild(btn);
+          wrap.appendChild(bodyWrap);
         });
         talksLoaded = true;
       });
