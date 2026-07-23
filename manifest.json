@@ -1,0 +1,12 @@
+{
+  "name": "営業サポートポータル | 幹開発株式会社",
+  "short_name": "営業サポート",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ],
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4FBFF",
+  "theme_color": "#2E9FD8"
+}
