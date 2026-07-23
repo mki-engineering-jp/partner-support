@@ -483,11 +483,18 @@
     text-align: center; font-size: 0.72rem; color: #6E93A5; padding: 18px 10px 26px;
   }
   @media (max-width: 520px) {
-    #messages { height: 58vh; }
-    .bubble { max-width: 90%; }
+    /* チャット欄の高さを抑え、入力欄までスクロールなしで収める */
+    #messages { height: 44vh; min-height: 240px; padding: 14px; }
+    .bubble { max-width: 90%; font-size: 0.88rem; }
     #login-view { padding: 28px 20px 24px; }
     #portal-tabs { flex-wrap: wrap; border-radius: 22px; }
     .tab-btn { flex: 1 1 30%; font-size: 0.8rem; padding: 9px 4px; }
+    .notice { padding: 10px 14px; font-size: 0.74rem; line-height: 1.7; }
+    #quick-questions { gap: 6px; margin-bottom: 10px; }
+    .qq-btn { font-size: 0.74rem; padding: 6px 11px; }
+    .chip-label { font-size: 0.72rem; }
+    #chat-input { padding: 11px 14px; font-size: 0.9rem; }
+    #send-btn { padding: 0 20px; }
     /* 製品カードを横型コンパクト表示(縦スクロール削減) */
     .prod-card {
       display: grid;
