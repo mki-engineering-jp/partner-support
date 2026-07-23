@@ -559,8 +559,8 @@
       <b>ご利用にあたって</b><br>
       ・お客様名などの個人情報は入力しないでください<br>
       ・製品名を含めてご質問いただくと、より正確にお答えできます<br>
-      ・正式なお見積りは sales@miki-kk.jp へメールでご依頼ください<br>
-      ・<button class="handoff-link" id="handoff-open-btn" type="button">AIで解決しない場合は、質問を担当者へ転送できます</button>
+      ・正式なお見積りは、メール（sales@miki-kk.jp）もしくはSlackでお問い合わせください<br>
+      ・<button class="handoff-link" id="handoff-open-btn" type="button">AIで解決しない場合は、質問を直接Slackへ転送できます</button>
     </div>
     <div id="quick-questions">
       <button class="qq-btn">騒音環境で使えるイヤホンは?</button>
@@ -617,7 +617,7 @@
     <div class="notice">
       <b>質問・要望BOX</b><br>
       ・「このツールに載せてほしい情報」「あると便利な資料」などのご要望や、ツールへのご質問をお送りください<br>
-      ・内容は担当者へ通知され、必要に応じてご登録のメールアドレス宛にご連絡いたします<br>
+      ・内容は担当者のSlackへ届き、必要に応じてご連絡いたします<br>
       ・お客様名などの個人情報は入力しないでください
     </div>
     <div class="qbox-card">
@@ -1105,10 +1105,10 @@
 
     var title = document.createElement("div");
     title.className = "handoff-title";
-    title.textContent = "この質問を担当者へ転送しますか？";
+    title.textContent = "この質問をSlackへ転送しますか？";
     var sub = document.createElement("div");
     sub.className = "handoff-sub";
-    sub.textContent = "担当者が内容を確認し、ご登録のメールアドレス宛に回答いたします。";
+    sub.textContent = "担当者のSlackへ直接届きます。内容を確認のうえ、ご回答いたします。";
 
     var qLabel = document.createElement("label");
     qLabel.className = "handoff-label";
@@ -1128,7 +1128,7 @@
     actions.className = "handoff-actions";
     var sendBtn = document.createElement("button");
     sendBtn.className = "handoff-send";
-    sendBtn.textContent = "担当者へ転送する";
+    sendBtn.textContent = "Slackへ転送する";
     var cancelBtn = document.createElement("button");
     cancelBtn.className = "handoff-cancel";
     cancelBtn.textContent = "閉じる";
@@ -1165,16 +1165,16 @@
       }).then(function (r) {
         if (!r.ok || r.data.error) {
           sendBtn.disabled = false;
-          sendBtn.textContent = "担当者へ転送する";
+          sendBtn.textContent = "Slackへ転送する";
           addBubble("ai", r.data.error || "転送に失敗しました。時間をおいて再度お試しください。", "error");
           return;
         }
         row.parentNode.removeChild(row);
         handoffCardEl = null;
-        addBubble("ai", "担当者へ転送しました。ご登録のメールアドレス宛に回答いたしますので、しばらくお待ちください。");
+        addBubble("ai", "Slackへ転送しました。担当者が内容を確認し、ご回答いたしますので、しばらくお待ちください。");
       }).catch(function () {
         sendBtn.disabled = false;
-        sendBtn.textContent = "担当者へ転送する";
+        sendBtn.textContent = "Slackへ転送する";
         addBubble("ai", "通信エラーが発生しました。再度お試しください。", "error");
       });
     });
