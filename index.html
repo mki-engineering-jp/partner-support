@@ -692,7 +692,19 @@
     }
   }
 
+  // ── アクセス記録（誰がいつポータルを開いたか） ──
+  var accessLogged = false;
+  function logAccess() {
+    if (accessLogged) return;
+    accessLogged = true;
+    try {
+      sb.from("access_logs").insert({ portal: "science_arts", page: "portal" })
+        .then(function () {});
+    } catch (e) { /* 記録失敗は無視（利用には影響させない） */ }
+  }
+
   function showChat() {
+    logAccess();
     $("login-view").style.display = "none";
     $("portal-tabs").style.display = "flex";
     $("logout-btn").style.display = "inline-block";
