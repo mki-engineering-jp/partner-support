@@ -354,6 +354,38 @@
     background: var(--white); display: block;
   }
 
+  /* ── 使い方(動画) ───────────────────────── */
+  #howto-view { display: none; }
+  .howto-card {
+    background: var(--white); border: 1px solid var(--line); border-radius: var(--radius);
+    padding: 18px 18px 16px; margin-bottom: 16px;
+  }
+  .howto-title {
+    font-family: "Zen Maru Gothic", sans-serif; font-weight: 700;
+    font-size: 1.02rem; color: var(--deep); margin-bottom: 4px;
+  }
+  .howto-sub { font-size: 0.78rem; color: #4A6E80; margin-bottom: 12px; line-height: 1.7; }
+  .howto-video {
+    width: 100%; aspect-ratio: 16 / 9; display: block;
+    border-radius: 12px; background: #0F3A4D; outline: none;
+  }
+  .howto-chapters { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+  .chap-btn {
+    border: 1px solid var(--line); border-radius: 999px; background: var(--white);
+    color: var(--deep); font-size: 0.78rem; font-family: "Zen Maru Gothic", sans-serif; font-weight: 700;
+    padding: 6px 12px; cursor: pointer; transition: background .15s, border-color .15s;
+  }
+  .chap-btn:hover { background: var(--mist); border-color: var(--sky); }
+  .chap-btn .chap-time { color: var(--sky); font-weight: 400; margin-right: 4px; font-family: "Noto Sans JP", sans-serif; }
+  .howto-points { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+  .howto-point {
+    background: var(--mist); border-radius: 12px; padding: 12px 14px;
+    font-size: 0.8rem; line-height: 1.8; color: #4A6E80;
+  }
+  .howto-point.wide { grid-column: 1 / -1; }
+  .howto-point b { display: block; color: var(--deep); font-size: 0.86rem; margin-bottom: 4px; }
+  .howto-point .warn { color: #C0532B; font-weight: 700; }
+
   /* ── セールストーク ─────────────────────── */
   #talks-view { display: none; }
   .talk-cat-title {
@@ -561,6 +593,7 @@
     <button class="tab-btn active" data-tab="chat-view">AIチャット</button>
     <button class="tab-btn" data-tab="products-view">製品ページ</button>
     <button class="tab-btn" data-tab="talks-view">セールストーク</button>
+    <button class="tab-btn" data-tab="howto-view">使い方</button>
     <button class="tab-btn" data-tab="kikikurabe-view">聞き比べ</button>
     <button class="tab-btn" data-tab="qbox-view">質問・要望</button>
   </nav>
@@ -607,6 +640,56 @@
     </div>
     <div id="prod-cat-chips"></div>
     <div id="products-list"></div>
+  </div>
+
+  <!-- 使い方(動画) -->
+  <div id="howto-view">
+    <div class="notice">
+      <b>使い方動画</b><br>
+      ・Bluetooth製品の正しい装着方法と、落下防止アクセサリのご提案をまとめた動画です<br>
+      ・お客様への納品時・導入説明の際にご活用ください<br>
+      ・本資料はパートナー様限定です。社外への転載はご遠慮ください
+    </div>
+
+    <div class="howto-card">
+      <div class="howto-title">Bluetooth製品の正しい装着方法・落下防止アクセサリのご提案</div>
+      <div class="howto-sub">MKI-P3 / MKI-P7 / MKI-P6 / MKI-P6MG の装着方法と通話方法、ネックストラップ・ダブルクリップによる落下防止（2分21秒）</div>
+      <video id="howto-video-1" class="howto-video" controls playsinline preload="metadata"
+             poster="videos/bluetooth-wearing-poster.jpg">
+        <source src="videos/bluetooth-wearing.mp4" type="video/mp4">
+        お使いのブラウザは動画再生に対応していません。<a href="videos/bluetooth-wearing.mp4">動画ファイルをダウンロード</a>
+      </video>
+      <div class="howto-chapters" aria-label="チャプター">
+        <button class="chap-btn" type="button" data-video="howto-video-1" data-t="10"><span class="chap-time">0:10</span>MKI-P3 / P7 装着・通話</button>
+        <button class="chap-btn" type="button" data-video="howto-video-1" data-t="35"><span class="chap-time">0:35</span>MKI-P6 / P6MG 装着・通話</button>
+        <button class="chap-btn" type="button" data-video="howto-video-1" data-t="73"><span class="chap-time">1:13</span>落下防止アクセサリのご提案</button>
+        <button class="chap-btn" type="button" data-video="howto-video-1" data-t="85"><span class="chap-time">1:25</span>ネックストラップ</button>
+        <button class="chap-btn" type="button" data-video="howto-video-1" data-t="107"><span class="chap-time">1:47</span>ダブルクリップ</button>
+      </div>
+    </div>
+
+    <div class="howto-points">
+      <div class="howto-point">
+        <b>MKI-P3 / MKI-P7</b>
+        背面のクリップで胸元に装着します。全方向の音を拾い、マイクから離れた音も入るため<b style="display:inline">胸元に付けたまま</b>お使いください。<br>
+        <span class="warn">送話時はPTTボタンを軽く押してください。強く押しすぎると故障につながります。</span>
+      </div>
+      <div class="howto-point">
+        <b>MKI-P6</b>
+        P3・P7と同様に背面のクリップで装着します。接話タイプのため、<b style="display:inline">口元に寄せて話す</b>ことで騒音下でもはっきりと相手に声を伝えられます。
+      </div>
+      <div class="howto-point">
+        <b>MKI-P6MG</b>
+        クリップとマグネット一体型パーツで装着します。P6とは特性が異なり接話タイプではないので、<b style="display:inline">胸元に装着したまま</b>送話できます。
+      </div>
+      <div class="howto-point wide">
+        <b>落下防止アクセサリ（市販品で代用可）</b>
+        落下による不具合を防ぐため、ネックストラップまたはダブルクリップをご提案ください。動画のBluetooth製品のクリップパーツにはすべてストラップ穴があります。<br>
+        ・<b style="display:inline">ネックストラップ</b>: クリップが外れても落下の心配がなく安心<br>
+        ・<b style="display:inline">ダブルクリップ</b>: 見た目をすっきりさせたい場合におすすめ。本体より下に取り付け、口元に寄せる際は本体側のクリップを外すと服が引っ張られずスムーズ<br>
+        ※現在、弊社での取り扱いはありません。
+      </div>
+    </div>
   </div>
 
   <!-- 聞き比べ -->
@@ -673,7 +756,7 @@
   function $(id) { return document.getElementById(id); }
 
   // ── 画面切り替え ─────────────────────────────
-  var TAB_IDS = ["chat-view", "products-view", "talks-view", "kikikurabe-view", "qbox-view"];
+  var TAB_IDS = ["chat-view", "products-view", "talks-view", "howto-view", "kikikurabe-view", "qbox-view"];
   var talksLoaded = false;
   var noticesLoaded = false;
 
@@ -690,7 +773,22 @@
       var fr = $("kikikurabe-frame");
       if (fr && !fr.getAttribute("src")) fr.setAttribute("src", fr.getAttribute("data-src"));
     }
+    // 使い方タブを離れたら動画を停止
+    if (tabId !== "howto-view") {
+      document.querySelectorAll(".howto-video").forEach(function (v) { try { v.pause(); } catch (e) {} });
+    }
   }
+
+  // ── 使い方動画: チャプター頭出し ──
+  document.querySelectorAll(".chap-btn").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var v = $(btn.getAttribute("data-video"));
+      if (!v) return;
+      v.currentTime = parseFloat(btn.getAttribute("data-t")) || 0;
+      var p = v.play();
+      if (p && p.catch) p.catch(function () {});
+    });
+  });
 
   // ── アクセス記録（誰がいつポータルを開いたか） ──
   var accessLogged = false;
