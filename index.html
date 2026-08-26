@@ -385,6 +385,35 @@
   .howto-point.wide { grid-column: 1 / -1; }
   .howto-point b { display: block; color: var(--deep); font-size: 0.86rem; margin-bottom: 4px; }
   .howto-point .warn { color: #C0532B; font-weight: 700; }
+  /* 故障事例 */
+  .howto-section-title {
+    font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; font-size: 1rem;
+    color: var(--deep); margin: 26px 0 10px; padding-left: 12px; border-left: 4px solid #C0532B;
+  }
+  .case-card {
+    background: var(--white); border: 1px solid #F3D3C6; border-radius: var(--radius);
+    padding: 18px; margin-bottom: 16px;
+  }
+  .case-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .case-tag {
+    background: #C0532B; color: #fff; font-size: 0.72rem; font-weight: 700;
+    border-radius: 999px; padding: 3px 10px; font-family: "Zen Maru Gothic", sans-serif;
+  }
+  .case-title { font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; font-size: 0.98rem; color: var(--deep); }
+  .case-photos { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 10px; margin: 10px 0 12px; }
+  .case-photos figure { margin: 0; }
+  .case-photos img {
+    width: 100%; aspect-ratio: 3 / 4; object-fit: cover; display: block;
+    border-radius: 10px; border: 1px solid var(--line); background: var(--mist); cursor: zoom-in;
+  }
+  .case-photos figcaption { font-size: 0.72rem; color: #4A6E80; margin-top: 4px; text-align: center; }
+  .case-body { font-size: 0.8rem; line-height: 1.8; color: #4A6E80; }
+  .case-body b { color: var(--deep); }
+  .case-advice {
+    margin-top: 10px; background: #FFF4EF; border-radius: 12px; padding: 12px 14px;
+    font-size: 0.82rem; line-height: 1.8; color: var(--deep);
+  }
+  .case-advice b { color: #C0532B; }
 
   /* ── セールストーク ─────────────────────── */
   #talks-view { display: none; }
@@ -645,9 +674,9 @@
   <!-- 使い方(動画) -->
   <div id="howto-view">
     <div class="notice">
-      <b>使い方動画</b><br>
-      ・Bluetooth製品の正しい装着方法と、落下防止アクセサリのご提案をまとめた動画です<br>
-      ・お客様への納品時・導入説明の際にご活用ください<br>
+      <b>使い方・故障事例</b><br>
+      ・Bluetooth製品の正しい装着方法と落下防止アクセサリのご提案をまとめた動画、実際に起きた故障事例を掲載しています<br>
+      ・お客様への納品時・導入説明の際にご活用ください（故障事例は今後も追加していきます）<br>
       ・本資料はパートナー様限定です。社外への転載はご遠慮ください
     </div>
 
@@ -688,6 +717,34 @@
         ・<b style="display:inline">ネックストラップ</b>: クリップが外れても落下の心配がなく安心<br>
         ・<b style="display:inline">ダブルクリップ</b>: 見た目をすっきりさせたい場合におすすめ。本体より下に取り付け、口元に寄せる際は本体側のクリップを外すと服が引っ張られずスムーズ<br>
         ※現在、弊社での取り扱いはありません。
+      </div>
+    </div>
+
+    <!-- 故障事例（事例を追加する場合は case-card ブロックを複製） -->
+    <div class="howto-section-title">故障事例 — 長くお使いいただくために</div>
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例01</span>
+        <span class="case-title">市販のUSB充電アダプターで充電し、本体が溶損（MKI-P3）</span>
+      </div>
+      <div class="case-photos">
+        <figure>
+          <img src="images/cases/case01-p3-usb-adapter-front.jpg" alt="MKI-P3 故障事例: 前面が溶けて基板が露出" loading="lazy"
+               data-lb-caption="事例01 MKI-P3 前面: 熱で筐体が溶け、基板が露出">
+          <figcaption>前面: 筐体が溶けて基板が露出</figcaption>
+        </figure>
+        <figure>
+          <img src="images/cases/case01-p3-usb-adapter-back.jpg" alt="MKI-P3 故障事例: 背面の変形" loading="lazy"
+               data-lb-caption="事例01 MKI-P3 背面: 熱でシリコンケースごと変形">
+          <figcaption>背面: シリコンケースごと変形</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>状況:</b> お客様先で市販のUSB充電アダプターを使用して充電したところ、本体が発熱して筐体が溶け、基板が露出した状態になりました。<br>
+        <b>原因:</b> 市販のUSBアダプターは出力（電圧・電流）や保護回路がまちまちで、接続先によっては規定を超える電力が本体に流れることがあります。付属のUSB充電ケーブルには過電流防止用の56kΩプルアップ抵抗が入っていますが、繋がる先のアダプターまでは選べません。
+      </div>
+      <div class="case-advice">
+        <b>営業からのご提案:</b> 充電は<b>充電ステーション SSZ-1050（MKI-P3CH10-2）</b>のご利用をおすすめしてください。専用ACアダプター付き・過充電防止・強力な過電流保護回路を備え、10台同時充電できます。付属のType-Cケーブルでの充電ももちろん可能ですが、<b>繋がる先が分からない以上、SSZ-1050での充電が不慮の事故を防ぐいちばん確実な方法</b>です。
       </div>
     </div>
   </div>
@@ -778,6 +835,13 @@
       document.querySelectorAll(".howto-video").forEach(function (v) { try { v.pause(); } catch (e) {} });
     }
   }
+
+  // ── 故障事例写真: タップで拡大 ──
+  document.querySelectorAll(".case-photos img").forEach(function (img) {
+    img.addEventListener("click", function () {
+      openLightbox(img.getAttribute("src"), img.getAttribute("data-lb-caption") || img.alt || "");
+    });
+  });
 
   // ── 使い方動画: チャプター頭出し ──
   document.querySelectorAll(".chap-btn").forEach(function (btn) {
