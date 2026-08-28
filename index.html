@@ -188,6 +188,12 @@
   .notices-head::before { content: "📢"; }
   .notice-item { padding: 8px 0; border-top: 1px dashed var(--line); }
   .notice-item:first-of-type { border-top: none; }
+  .notice-head-row { cursor: pointer; display: flex; align-items: baseline; gap: 8px; }
+  .notice-head-row:hover .notice-title { color: var(--aqua); }
+  .notice-arrow { font-size: 0.7rem; color: #4A6E80; transition: transform 0.15s; flex: 0 0 auto; }
+  .notice-item.open .notice-arrow { transform: rotate(90deg); }
+  .notice-content { display: none; }
+  .notice-item.open .notice-content { display: block; }
   .notice-date { font-size: 0.72rem; color: #4A6E80; }
   .notice-title { font-size: 0.88rem; font-weight: 700; margin: 2px 0; }
   .notice-body { font-size: 0.82rem; color: #345A6C; line-height: 1.8; white-space: pre-wrap; word-break: break-word; }
@@ -628,7 +634,7 @@
 
   <!-- タブナビ(ログイン後に表示) -->
   <nav id="portal-tabs" aria-label="ページ切り替え">
-    <button class="tab-btn active" data-tab="chat-view">AIチャット</button>
+    <button class="tab-btn active" data-tab="chat-view">AIチャット/お知らせ</button>
     <button class="tab-btn" data-tab="products-view">製品ページ</button>
     <button class="tab-btn" data-tab="talks-view">セールストーク</button>
     <button class="tab-btn" data-tab="howto-view">使い方</button>
@@ -636,14 +642,13 @@
     <button class="tab-btn" data-tab="qbox-view">質問・要望</button>
   </nav>
 
-  <!-- 管理者からのお知らせ(ログイン後・全タブ共通で表示) -->
-  <div id="notices-box" aria-label="管理者からのお知らせ">
-    <div class="notices-head">お知らせ</div>
-    <div id="notices-list"></div>
-  </div>
-
   <!-- チャット -->
   <div id="chat-view">
+    <!-- 管理者からのお知らせ(AIチャット/お知らせタブ内のみ表示) -->
+    <div id="notices-box" aria-label="管理者からのお知らせ">
+      <div class="notices-head">お知らせ</div>
+      <div id="notices-list"></div>
+    </div>
     <div class="notice">
       <b>ご利用にあたって</b><br>
       ・お客様名などの個人情報は入力しないでください<br>
@@ -919,7 +924,7 @@
         .eq("portal", "science_arts")
         .eq("published", true)
         .order("created_at", { ascending: false })
-        .limit(5),
+        .limit(10),
       sb.rpc("notice_like_counts"),
       sb.from("notice_reactions").select("notice_id")
     ]).then(function (results) {
@@ -932,20 +937,31 @@
 
       var list = $("notices-list");
       list.innerHTML = "";
-      res.data.forEach(function (n) {
+      res.data.forEach(function (n, idx) {
         var item = document.createElement("div");
-        item.className = "notice-item";
+        item.className = "notice-item" + (idx === 0 ? " open" : "");
+
+        var head = document.createElement("div");
+        head.className = "notice-head-row";
+        var arrow = document.createElement("span");
+        arrow.className = "notice-arrow";
+        arrow.textContent = "▶";
+        var meta = document.createElement("div");
         var d = document.createElement("div");
         d.className = "notice-date";
         d.textContent = n.created_at ? String(n.created_at).slice(0, 10).replace(/-/g, "/") : "";
         var t = document.createElement("div");
         t.className = "notice-title";
         t.textContent = n.title || "";
-        var b = document.createElement("div");
-        b.className = "notice-body";
-        b.textContent = n.body || "";
-        item.appendChild(d);
-        item.appendChild(t);
+        meta.appendChild(d);
+        meta.appendChild(t);
+        head.appendChild(arrow);
+        head.appendChild(meta);
+        head.addEventListener("click", function () { item.classList.toggle("open"); });
+        item.appendChild(head);
+
+        var content = document.createElement("div");
+        content.className = "notice-content";
         if (n.image_url) {
           var im = document.createElement("img");
           im.className = "notice-img";
@@ -956,10 +972,16 @@
           im.addEventListener("click", function () {
             openLightbox(n.image_url, n.title || "");
           });
-          item.appendChild(im);
+          content.appendChild(im);
         }
-        if (n.body) item.appendChild(b);
-        item.appendChild(buildLikeRow(n.id, counts[n.id] || 0, !!mine[n.id]));
+        if (n.body) {
+          var b = document.createElement("div");
+          b.className = "notice-body";
+          b.textContent = n.body || "";
+          content.appendChild(b);
+        }
+        content.appendChild(buildLikeRow(n.id, counts[n.id] || 0, !!mine[n.id]));
+        item.appendChild(content);
         list.appendChild(item);
       });
       $("notices-box").style.display = "block";
