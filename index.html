@@ -1749,10 +1749,6 @@
             bodyWrap.appendChild(card);
           });
 
-          if (idx === 0) {
-            btn.className = "talk-cat-btn open";
-            bodyWrap.className = "talk-cat-body open";
-          }
           btn.addEventListener("click", function () {
             var open = bodyWrap.className.indexOf("open") >= 0;
             bodyWrap.className = "talk-cat-body" + (open ? "" : " open");
