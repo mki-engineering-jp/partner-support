@@ -413,6 +413,24 @@
     border-radius: 10px; border: 1px solid var(--line); background: var(--mist); cursor: zoom-in;
   }
   .case-photos figcaption { font-size: 0.72rem; color: #4A6E80; margin-top: 4px; text-align: center; }
+  .case-photos figure.land img { aspect-ratio: 4 / 3; }
+  .case-photos figure.doc img { aspect-ratio: 16 / 9; object-fit: contain; background: #fff; }
+  .case-photos figure.doc { grid-column: 1 / -1; max-width: 560px; }
+  .case-photos video {
+    width: 100%; aspect-ratio: 4 / 5; display: block; object-fit: cover;
+    border-radius: 10px; border: 1px solid var(--line); background: #000;
+  }
+  .case-photos figure.video { max-width: 260px; }
+  .case-sub { font-size: 0.74rem; color: #4A6E80; margin-top: -2px; margin-bottom: 8px; }
+  .case-summary {
+    background: #FFF4EF; border: 1px solid #F3D3C6; border-radius: var(--radius);
+    padding: 16px 18px; margin-bottom: 16px; font-size: 0.8rem; line-height: 1.8; color: var(--deep);
+  }
+  .case-summary .cs-title { font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; font-size: 0.92rem; color: #C0532B; margin-bottom: 6px; }
+  .case-summary ol { margin: 0; padding-left: 1.4em; }
+  .case-summary li { margin: 2px 0; }
+  .case-summary li b { color: var(--deep); }
+  .case-summary .cs-note { font-size: 0.74rem; color: #4A6E80; margin-top: 8px; }
   .case-body { font-size: 0.8rem; line-height: 1.8; color: #4A6E80; }
   .case-body b { color: var(--deep); }
   .case-advice {
@@ -689,7 +707,7 @@
   <div id="howto-view">
     <div class="notice">
       <b>使い方・故障事例</b><br>
-      ・Bluetooth製品の正しい装着方法と落下防止アクセサリのご提案をまとめた動画、実際に起きた故障事例を掲載しています<br>
+      ・Bluetooth製品の正しい装着方法と落下防止アクセサリのご提案をまとめた動画、実際に起きた故障事例（12件・写真/動画つき）とお客様にお伝えいただきたい「6つのお願い」を掲載しています<br>
       ・お客様への納品時・導入説明の際にご活用ください（故障事例は今後も追加していきます）<br>
       ・本資料はパートナー様限定です。社外への転載はご遠慮ください
     </div>
@@ -734,8 +752,21 @@
       </div>
     </div>
 
-    <!-- 故障事例（事例を追加する場合は case-card ブロックを複製） -->
+    <!-- 故障事例（事例を追加する場合は case-card ブロックを複製。写真は images/cases/、動画は videos/cases/） -->
     <div class="howto-section-title">故障事例 — 長くお使いいただくために</div>
+    <div class="case-summary">
+      <div class="cs-title">お客様にお伝えいただきたい「6つのお願い」</div>
+      故障の多くは落下・強い押し込み・充電方法・環境が原因です。納品時・導入説明の際に、次のポイントをお客様にお伝えください（各事例の詳細は下記）。
+      <ol>
+        <li><b>シリコンケースを装着し、落下させない</b>（ボタン陥没・起動不可・充電不可・ペアリング不可の主因）</li>
+        <li><b>PTT・MF・F1〜F3の各ボタンを強く押し込まない</b>（軽く押すだけで反応します）</li>
+        <li><b>充電は付属ケーブルまたは充電ステーション SSZ-1050 で。</b>市販アダプターは使わない</li>
+        <li><b>満充電・0%の状態で長時間放置しない</b>（バッテリー劣化・過放電）</li>
+        <li><b>水濡れ・高湿度・粉塵の多い環境を避け、装着したままの飲食を控える</b>（マイクメッシュ詰まり・腐食）</li>
+        <li><b>有線イヤホンマイクのケーブルを引っ張らない・プラグ根元を折り曲げない</b></li>
+      </ol>
+      <div class="cs-note">出典: 幹開発株式会社「サイエンスアーツ様 不具合内容」（2026年8月26日）。保証適用の可否は個別にご確認ください。</div>
+    </div>
     <div class="case-card">
       <div class="case-head">
         <span class="case-tag">事例01</span>
@@ -759,6 +790,257 @@
       </div>
       <div class="case-advice">
         <b>営業からのご提案:</b> 充電は<b>充電ステーション SSZ-1050（MKI-P3CH10-2）</b>のご利用をおすすめしてください。専用ACアダプター付き・過充電防止・強力な過電流保護回路を備え、10台同時充電できます。付属のType-Cケーブルでの充電ももちろん可能ですが、<b>繋がる先が分からない以上、SSZ-1050での充電が不慮の事故を防ぐいちばん確実な方法</b>です。
+      </div>
+    </div>
+
+    <!-- 事例02 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例02</span>
+        <span class="case-title">ファンクションボタンの陥没（MKI-P3）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="land">
+          <img src="images/cases/case02-p3-function-button.jpg" alt="MKI-P3 故障事例: 左が良品、右がマルチファンクションボタンが陥没した不具合品" loading="lazy"
+               data-lb-caption="事例02 MKI-P3 左: 良品 ／ 右: マルチファンクション（MF）ボタンが陥没した不具合品">
+          <figcaption>左: 良品 ／ 右: MFボタンが陥没した不具合品</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> ボタンが押し込まれたまま戻らない・押した感触がなくなる。使用頻度の高い<b>MFボタン・F1ボタン</b>で多く発生しています。<br>
+        <b>原因:</b> 落下による基板のズレ、使用時の強い押し込みによる負荷。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>シリコンケースを装着</b>し、落下を防いでください。ボタンは<b>強く押し込まず、軽く押す</b>だけで反応します。
+      </div>
+    </div>
+
+    <!-- 事例03 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例03</span>
+        <span class="case-title">PTTボタンの陥没（MKI-P6）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="video">
+          <video class="case-video" controls playsinline preload="none" poster="images/cases/case03-p6-ptt-sunk-poster.jpg">
+            <source src="videos/cases/case03-p6-ptt-sunk.mp4" type="video/mp4">
+            <a href="videos/cases/case03-p6-ptt-sunk.mp4">動画ファイルをダウンロード</a>
+          </video>
+          <figcaption>動画（20秒・音あり）: 左が良品、右がPTTボタン陥没品</figcaption>
+        </figure>
+      </div>
+      <div class="case-sub">※音ありで再生すると、良品と不具合品のクリック感の違いが分かります。</div>
+      <div class="case-body">
+        <b>症状:</b> PTTボタンが沈み込んだままになり、送話できない。<br>
+        <b>原因:</b> 本体落下による基板破損。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>シリコンケースを装着</b>し、落下を防いでください。<b>PTTボタンを強く押し込まない</b>ようお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例04 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例04</span>
+        <span class="case-title">PTTボタンのゴーストタッチ（MKI-P6）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="video">
+          <video class="case-video" controls playsinline preload="none" poster="images/cases/case04-p6-ptt-ghost-poster.jpg">
+            <source src="videos/cases/case04-p6-ptt-ghost.mp4" type="video/mp4">
+            <a href="videos/cases/case04-p6-ptt-ghost.mp4">動画ファイルをダウンロード</a>
+          </video>
+          <figcaption>動画（15秒）: 触れていないのにマイクON/OFFが切り替わる</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> PTTボタンに触れていないのにスイッチが反応し、マイクのON/OFFが勝手に切り替わる（＝ゴーストタッチ）。<br>
+        <b>原因:</b> 強い負荷によるボタン内部の故障。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> PTTボタンを<b>強く押し込まない</b>ようお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例05 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例05</span>
+        <span class="case-title">起動しない（MKI-P6）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="video">
+          <video class="case-video" controls playsinline preload="none" poster="images/cases/case05-p6-no-power-poster.jpg">
+            <source src="videos/cases/case05-p6-no-power.mp4" type="video/mp4">
+            <a href="videos/cases/case05-p6-no-power.mp4">動画ファイルをダウンロード</a>
+          </video>
+          <figcaption>動画（18秒）: 電源スイッチONでも緑LEDが点灯しない</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 電源スイッチを入れても起動せず、緑LEDが点灯しない。<br>
+        <b>原因:</b> 落下による基板破損、またはスライドスイッチ接触箇所の腐食（湿気・水濡れ）。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>シリコンケースを装着</b>して落下を防ぎ、<b>高湿度環境での使用を避け、水没させない</b>ようお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例06 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例06</span>
+        <span class="case-title">充電できない（MKI-P6）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="video">
+          <video class="case-video" controls playsinline preload="none" poster="images/cases/case06-p6-no-charge-poster.jpg">
+            <source src="videos/cases/case06-p6-no-charge.mp4" type="video/mp4">
+            <a href="videos/cases/case06-p6-no-charge.mp4">動画ファイルをダウンロード</a>
+          </video>
+          <figcaption>動画（10秒）: ケーブルを挿しても充電が始まらない</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 充電ケーブルを接続しても充電されない。<br>
+        <b>原因:</b> 落下によるバッテリーコネクタ外れ、または過放電。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>シリコンケースを装着</b>して落下を防いでください。充電は<b>付属ケーブルまたは充電ステーション SSZ-1050 以外で行わない</b>こと、<b>満充電や0%の状態で長時間放置しない</b>ことをお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例07 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例07</span>
+        <span class="case-title">バッテリーの劣化（連続使用時間が短くなる）</span>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 満充電にしても使用時間が極端に短くなる。<br>
+        <b>原因:</b> 満充電または0%の状態での長時間放置。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>満充電・0%の状態で長時間放置しない</b>（長期保管時は適度に充電する）、<b>付属ケーブルまたは充電ステーション SSZ-1050 以外で充電しない</b>ようお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例08 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例08</span>
+        <span class="case-title">イヤホンジャックの脱落（MKI-P3）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="land">
+          <img src="images/cases/case08-p3-earphone-jack.jpg" alt="MKI-P3 故障事例: イヤホンジャックが基板から脱落" loading="lazy"
+               data-lb-caption="事例08 MKI-P3 イヤホンジャックが本体から脱落（内部）">
+          <figcaption>イヤホンジャックが本体から脱落（内部）</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> イヤホンを挿してもぐらつく・固定されない、音が出ない。<br>
+        <b>原因:</b> イヤホンプラグを介してイヤホンジャックに強い負荷がかかったため（落下、プラグのこじり）。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> 本体を<b>落下させない</b>こと、<b>イヤホンプラグの根元を折り曲げない</b>ことをお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例09 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例09</span>
+        <span class="case-title">送話音が小さい（MKI-P3）</span>
+      </div>
+      <div class="case-photos">
+        <figure>
+          <img src="images/cases/case09-p3-mic-mesh.jpg" alt="MKI-P3 故障事例: マイクメッシュの詰まり（顕微鏡写真）" loading="lazy"
+               data-lb-caption="事例09 MKI-P3 マイクメッシュの詰まり（顕微鏡写真・150倍）">
+          <figcaption>マイクメッシュの詰まり（顕微鏡写真）</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 相手に声が小さく届く・聞き取りにくいと言われる。<br>
+        <b>原因:</b> マイクメッシュの詰まり（粉塵・飲食物の付着）、水没。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>粉塵のひどい環境での使用</b>や、<b>装着したままの飲食</b>を避けるようお伝えください。
+      </div>
+    </div>
+
+    <!-- 事例10 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例10</span>
+        <span class="case-title">クリップの破損（MKI-P3・旧クリップ）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="land">
+          <img src="images/cases/case10-p3-clip.jpg" alt="MKI-P3 故障事例: 旧クリップの破損" loading="lazy"
+               data-lb-caption="事例10 MKI-P3 旧クリップが根元から破損">
+          <figcaption>旧クリップが根元から破損</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 背面クリップが折れる・外れる。<br>
+        <b>原因:</b> 落下、旧クリップ部の強度不足。<b>現在は新形状のクリップに変更済み</b>です。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> 落下防止のため、<b>ネックストラップやダブルクリップの併用</b>をご提案ください（上記「落下防止アクセサリ」参照）。
+      </div>
+    </div>
+
+    <!-- 事例11 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例11</span>
+        <span class="case-title">プラグの破損 — 傷・折れ・歪み（有線イヤホンマイク）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="doc">
+          <img src="images/cases/case11-plug-damage.jpg" alt="有線イヤホンマイクの故障の原因: プラグの傷・曲がり・折れ" loading="lazy"
+               data-lb-caption="事例11 有線イヤホンマイクの故障の原因 — 大半がプラグ起因（傷・曲がり・折れ）">
+          <figcaption>故障原因の大半はプラグ起因（傷・曲がり・折れ）</figcaption>
+        </figure>
+        <figure class="doc">
+          <img src="images/cases/case11-plug-caution.jpg" alt="有線イヤホンマイクの使用上の注意: プラグに圧力がかかる使い方の例" loading="lazy"
+               data-lb-caption="事例11 有線イヤホンマイクの使用上の注意 — プラグに圧力がかかる使い方の例">
+          <figcaption>使用上の注意: プラグに圧力がかかる使い方の例</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> 音が途切れる・片側しか聞こえない・認識しない。<br>
+        <b>原因:</b> プラグの回転や、ケーブルが引っ張られるなどの負荷。ケーブルをぎりぎりまで伸ばす、ポケットにプラグ部を下向きに入れる、その状態で座る、使用のたびに抜き差しする、といった使い方で発生します。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>ケーブルを引っ張らない</b>、<b>ポケットに入れてプラグに負荷がかかる状態で使わない</b>ようお伝えください。端末返却時はイヤホンマイクを接続したままにし、抜き差しはイヤホンのみにしていただくのがおすすめです。
+      </div>
+    </div>
+
+    <!-- 事例12 -->
+    <div class="case-card">
+      <div class="case-head">
+        <span class="case-tag">事例12</span>
+        <span class="case-title">ペアリング・リセットができない（MKI-P6）</span>
+      </div>
+      <div class="case-photos">
+        <figure class="video">
+          <video class="case-video" controls playsinline preload="none" poster="images/cases/case12-p6-pairing-poster.jpg">
+            <source src="videos/cases/case12-p6-pairing.mp4" type="video/mp4">
+            <a href="videos/cases/case12-p6-pairing.mp4">動画ファイルをダウンロード</a>
+          </video>
+          <figcaption>動画（23秒）: PTTボタン故障が原因でペアリングに入れない</figcaption>
+        </figure>
+      </div>
+      <div class="case-body">
+        <b>症状:</b> マルチボタン長押しでペアリングモードに入らない、リセット操作が効かない。<br>
+        <b>原因:</b> 落下や強い押し込みで他のボタン（PTTなど）が常時押された状態として検知され、操作を受け付けなくなる。
+      </div>
+      <div class="case-advice">
+        <b>お客様へのお願い:</b> <b>シリコンケースを装着</b>して落下を防ぎ、<b>ボタンを強く押し込まない</b>ようお伝えください。※ペアリングできない場合は、まず他のボタンが押し込まれたままになっていないかご確認ください。
       </div>
     </div>
   </div>
