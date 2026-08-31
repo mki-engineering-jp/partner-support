@@ -567,15 +567,6 @@
   footer {
     text-align: center; font-size: 0.72rem; color: #6E93A5; padding: 18px 10px 26px;
   }
-  .company-info {
-    max-width: 560px; margin: 8px auto 0; text-align: center;
-    font-size: 0.78rem; color: #4A6E80; line-height: 1.9;
-  }
-  .company-info b { color: var(--deep); font-size: 0.84rem; }
-  .company-map {
-    width: 100%; max-width: 560px; height: 240px; border: 1px solid var(--line);
-    border-radius: var(--radius); margin: 8px auto 0; display: block;
-  }
   @media (max-width: 520px) {
     /* チャット欄の高さを抑え、入力欄までスクロールなしで収める */
     #messages { height: 44vh; min-height: 240px; padding: 14px; }
@@ -679,6 +670,7 @@
       <button class="qq-btn">3年保証の内容を教えてください</button>
       <button class="qq-btn">Buddycomとの接続手順は?</button>
       <button class="qq-btn">耳を塞がないイヤホンはありますか?</button>
+      <button class="qq-btn">幹開発の連絡先・所在地は?</button>
     </div>
     <div id="messages"></div>
     <div id="product-chips-wrap">
@@ -1086,15 +1078,7 @@
 </main>
 
 <footer>
-  <div class="company-info">
-    <b>幹開発株式会社（MKI Engineering Co., Ltd.）</b><br>
-    〒180-0006 東京都武蔵野市中町1丁目22-7 コトー三鷹マンション<br>
-    TEL: 0422-55-0005（代表）／ 製品のお問い合わせ: 0422-55-9334（祝日を除く平日10:00〜17:00）・sales@miki-kk.jp
-  </div>
-  <iframe class="company-map" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
-    src="https://maps.google.com/maps?q=%E6%9D%B1%E4%BA%AC%E9%83%BD%E6%AD%A6%E8%94%B5%E9%87%8E%E5%B8%82%E4%B8%AD%E7%94%BA1-22-7&z=16&output=embed"
-    title="幹開発株式会社 地図"></iframe>
-  <div style="margin-top:14px;">© 幹開発株式会社 MKI Engineering Co., Ltd.</div>
+  <div>© 幹開発株式会社 MKI Engineering Co., Ltd.</div>
 </footer>
 
 <!-- 画像拡大表示 -->
