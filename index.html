@@ -414,6 +414,7 @@
   }
   .case-photos figcaption { font-size: 0.72rem; color: #4A6E80; margin-top: 4px; text-align: center; }
   .case-photos figure.land img { aspect-ratio: 4 / 3; }
+  .case-photos figure.sq img { aspect-ratio: 1 / 1; }
   .case-photos figure.small { max-width: 280px; }
   .case-photos figure.small img { aspect-ratio: auto; image-rendering: auto; }
   .case-photos figure.doc img { aspect-ratio: 16 / 9; object-fit: contain; background: #fff; }
@@ -424,6 +425,25 @@
   }
   .case-photos figure.video { max-width: 260px; }
   .case-sub { font-size: 0.74rem; color: #4A6E80; margin-top: -2px; margin-bottom: 8px; }
+  /* PC幅: 写真/動画を左の固定幅カラムに、説明を右に（写真と動画の表示サイズを揃える） */
+  @media (min-width: 720px) {
+    .case-card:not(.stack) {
+      display: grid; grid-template-columns: 300px 1fr; grid-template-rows: auto auto auto auto 1fr;
+      column-gap: 22px; align-items: start;
+    }
+    .case-card:not(.stack) .case-head { grid-column: 1 / -1; }
+    .case-card:not(.stack) .case-photos {
+      grid-column: 1; grid-row: 2 / 6; margin: 6px 0 0;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    }
+    .case-card:not(.stack) .case-sub,
+    .case-card:not(.stack) .case-body,
+    .case-card:not(.stack) .case-advice { grid-column: 2; }
+    .case-card:not(.stack) .case-body { margin-top: 6px; }
+    .case-card:not(.stack) .case-photos figure.video,
+    .case-card:not(.stack) .case-photos figure.small { max-width: none; }
+    .case-card.stack .case-photos figure.doc { max-width: 640px; }
+  }
   .case-summary {
     background: #FFF4EF; border: 1px solid #F3D3C6; border-radius: var(--radius);
     padding: 16px 18px; margin-bottom: 16px; font-size: 0.8rem; line-height: 1.8; color: var(--deep);
@@ -907,7 +927,7 @@
     </div>
 
     <!-- 事例07 -->
-    <div class="case-card">
+    <div class="case-card stack">
       <div class="case-head">
         <span class="case-tag">事例07</span>
         <span class="case-title">バッテリーの劣化（連続使用時間が短くなる）</span>
@@ -950,7 +970,7 @@
         <span class="case-title">送話音が小さい（MKI-P3）</span>
       </div>
       <div class="case-photos">
-        <figure>
+        <figure class="sq">
           <img src="images/cases/case09-p3-mic-mesh.jpg" alt="MKI-P3 故障事例: マイクメッシュの詰まり（顕微鏡写真）" loading="lazy"
                data-lb-caption="事例09 MKI-P3 マイクメッシュの詰まり（顕微鏡写真・150倍）">
           <figcaption>マイクメッシュの詰まり（顕微鏡写真）</figcaption>
@@ -988,7 +1008,7 @@
     </div>
 
     <!-- 事例11 -->
-    <div class="case-card">
+    <div class="case-card stack">
       <div class="case-head">
         <span class="case-tag">事例11</span>
         <span class="case-title">プラグの破損 — 傷・折れ・歪み（有線イヤホンマイク）</span>
