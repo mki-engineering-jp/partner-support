@@ -413,6 +413,20 @@
   .howto-point.wide { grid-column: 1 / -1; }
   .howto-point b { display: block; color: var(--deep); font-size: 0.86rem; margin-bottom: 4px; }
   .howto-point .warn { color: #C0532B; font-weight: 700; }
+  /* クイックスタートガイド(PDF) */
+  .guide-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  .guide-link {
+    display: flex; align-items: center; gap: 12px; text-decoration: none;
+    background: var(--mist); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px;
+    color: var(--deep); transition: background .15s, border-color .15s;
+  }
+  .guide-link:hover { background: var(--white); border-color: var(--sky); }
+  .guide-icon {
+    flex: none; width: 40px; height: 40px; border-radius: 10px; background: #C0532B; color: #fff;
+    display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.72rem; letter-spacing: .04em;
+  }
+  .guide-name { font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; font-size: 0.9rem; line-height: 1.4; }
+  .guide-meta { font-size: 0.74rem; color: #4A6E80; margin-top: 2px; line-height: 1.5; }
   /* 故障事例 */
   .howto-section-title {
     font-family: "Zen Maru Gothic", sans-serif; font-weight: 700; font-size: 1rem;
@@ -748,9 +762,31 @@
   <div id="howto-view">
     <div class="notice">
       <b>使い方・故障事例</b><br>
-      ・Bluetooth製品の「正しい装着方法」「注意事項とメンテナンス（充電・お手入れ・風防交換）」の動画2本、実際に起きた故障事例（12件・写真/動画つき）とお客様にお伝えいただきたい「6つのお願い」を掲載しています<br>
+      ・各製品のクイックスタートガイド（PDF）、Bluetooth製品の「正しい装着方法」「注意事項とメンテナンス（充電・お手入れ・風防交換）」の動画2本、実際に起きた故障事例（12件・写真/動画つき）とお客様にお伝えいただきたい「6つのお願い」を掲載しています<br>
       ・お客様への納品時・導入説明の際にご活用ください（故障事例は今後も追加していきます）<br>
       ・本資料はパートナー様限定です。社外への転載はご遠慮ください
+    </div>
+
+    <!-- クイックスタートガイド(PDF)。差し替えは guides/ のファイルを上書き -->
+    <div class="howto-card">
+      <div class="howto-title">クイックスタートガイド（PDF）</div>
+      <div class="howto-sub">各部名称・ボタン機能・ペアリング手順・LED表示・リセット（初期化）方法。お客様への納品時にもご利用いただけます</div>
+      <div class="guide-list">
+        <a class="guide-link" href="guides/ssw-1010_1090_quickstart.pdf" target="_blank" rel="noopener" download="MKI-P3_P6_クイックスタートガイド.pdf">
+          <span class="guide-icon">PDF</span>
+          <span>
+            <span class="guide-name">MKI-P3 / P3NL / P6 / P6NL / P6MG 共通</span>
+            <span class="guide-meta" style="display:block">SSW-1010 / SSW-1090系 ワイヤレスPTTタイピンマイク（約0.4MB）</span>
+          </span>
+        </a>
+        <a class="guide-link" href="guides/ssw-1060_quickstart.pdf" target="_blank" rel="noopener" download="MKI-P7_クイックスタートガイド.pdf">
+          <span class="guide-icon">PDF</span>
+          <span>
+            <span class="guide-name">MKI-P7</span>
+            <span class="guide-meta" style="display:block">SSW-1060 ワイヤレスPTTマイク（約0.5MB）</span>
+          </span>
+        </a>
+      </div>
     </div>
 
     <div class="howto-card">
