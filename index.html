@@ -137,6 +137,13 @@
     font-size: 0.72rem; color: #6B8C9C; background: var(--mist);
     padding: 2px 12px; border-radius: 999px;
   }
+  .hist-old { display: none; flex-direction: column; gap: 12px; }
+  .hist-old.open { display: flex; }
+  .hist-toggle {
+    border: 1px solid var(--line); border-radius: 999px; background: var(--white);
+    color: var(--sky); font-size: 0.76rem; font-family: inherit; padding: 5px 14px; cursor: pointer;
+  }
+  .hist-toggle:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
   #hist-bar {
     display: none; justify-content: space-between; align-items: center; gap: 8px;
     margin-top: 8px; font-size: 0.74rem; color: #6B8C9C;
@@ -1260,13 +1267,13 @@
     var d = new Date(t);
     return (d.getMonth() + 1) + "/" + d.getDate() + "(" + WDAYS[d.getDay()] + ")";
   }
-  function addDivider(text) {
+  function addDivider(text, parent) {
     var row = document.createElement("div");
     row.className = "row divider";
     var s = document.createElement("span");
     s.textContent = text;
     row.appendChild(s);
-    $("messages").appendChild(row);
+    (parent || $("messages")).appendChild(row);
   }
   // 戻り値: 復元した(true) / 履歴なし(false)
   function restoreHistory(email) {
@@ -1274,11 +1281,39 @@
     var list = histLoad();
     if (!list.length) { $("hist-bar").style.display = "none"; return false; }
     var cutoff = Date.now() - HIST_CONTEXT_MIN * 60 * 1000;
-    var lastDay = "";
     chatHistory = [];
-    list.forEach(function (e) {
-      var day = histDayLabel(e.t);
-      if (day !== lastDay) { addDivider(day); lastDay = day; }
+    // 最新の日付分だけ展開し、それより前は「以前の履歴を表示」ボタンに折りたたむ
+    var latestDay = histDayLabel(list[list.length - 1].t);
+    var older = list.filter(function (e) { return histDayLabel(e.t) !== latestDay; });
+    var recent = list.filter(function (e) { return histDayLabel(e.t) === latestDay; });
+    var msgs = $("messages");
+    if (older.length) {
+      var toggleRow = document.createElement("div");
+      toggleRow.className = "row divider";
+      var toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "hist-toggle";
+      toggle.textContent = "以前の履歴を表示（" + older.length + "件）";
+      toggleRow.appendChild(toggle);
+      msgs.appendChild(toggleRow);
+      var oldBox = document.createElement("div");
+      oldBox.className = "hist-old";
+      var lastDay = "";
+      older.forEach(function (e) {
+        var day = histDayLabel(e.t);
+        if (day !== lastDay) { addDivider(day, oldBox); lastDay = day; }
+        addBubble("user", e.q, null, oldBox);
+        addBubble("ai", e.a, null, oldBox);
+      });
+      msgs.appendChild(oldBox);
+      toggle.addEventListener("click", function () {
+        var open = oldBox.classList.toggle("open");
+        toggle.textContent = open ? "以前の履歴を閉じる" : "以前の履歴を表示（" + older.length + "件）";
+        if (open) toggleRow.scrollIntoView({ block: "start" });
+      });
+    }
+    addDivider(latestDay);
+    recent.forEach(function (e) {
       addBubble("user", e.q);
       addBubble("ai", e.a);
       if (e.t >= cutoff) {
@@ -2183,13 +2218,14 @@
   });
 
   // ── ユーティリティ ───────────────────────────
-  function addBubble(who, text, extraClass) {
+  function addBubble(who, text, extraClass, parent) {
     var row = document.createElement("div");
     row.className = "row " + who;
     var b = document.createElement("div");
     b.className = "bubble" + (extraClass ? " " + extraClass : "");
     b.textContent = text;
     row.appendChild(b);
+    if (parent) { parent.appendChild(row); return row; }   // 折りたたみ履歴など、別の入れ物に追加
     $("messages").appendChild(row);
     row.scrollIntoView({ block: "end" });
     return row;
