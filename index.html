@@ -131,6 +131,21 @@
   .row.ai .bubble.error { background: #FDEDEB; color: #A03A2F; }
   .row.ai .bubble.loading { color: #4A6E80; }
   .bubble a { color: var(--sky); }
+  /* ── 履歴の日付区切り／履歴バー(v3.4) ─────── */
+  .row.divider { justify-content: center; }
+  .row.divider span {
+    font-size: 0.72rem; color: #6B8C9C; background: var(--mist);
+    padding: 2px 12px; border-radius: 999px;
+  }
+  #hist-bar {
+    display: none; justify-content: space-between; align-items: center; gap: 8px;
+    margin-top: 8px; font-size: 0.74rem; color: #6B8C9C;
+  }
+  #hist-clear-btn {
+    border: 1px solid var(--line); border-radius: 999px; background: var(--white);
+    color: #6B8C9C; font-size: 0.72rem; font-family: inherit; padding: 4px 10px; cursor: pointer;
+  }
+  #hist-clear-btn:hover { color: #A03A2F; border-color: #A03A2F; }
   #input-bar { display: flex; gap: 10px; margin-top: 14px; }
   #chat-input {
     flex: 1; padding: 13px 16px;
@@ -696,6 +711,10 @@
       <button class="qq-btn">幹開発の連絡先・所在地は?</button>
     </div>
     <div id="messages"></div>
+    <div id="hist-bar">
+      <span>質問と回答はこの端末のブラウザに保存されます(最大100件・他の端末とは共有されません)</span>
+      <button id="hist-clear-btn" type="button">履歴を消す</button>
+    </div>
     <div id="product-chips-wrap">
       <span class="chip-label">製品を指定(任意):</span>
       <div id="product-chips"></div>
@@ -1205,10 +1224,85 @@
     renderProductChips();
     if (!noticesLoaded) loadNotices();
     if ($("messages").childElementCount === 0) {
-      $("quick-questions").style.display = "flex";
-      addBubble("ai", "こんにちは。製品の使い方・セールスポイント・見積のご相談など、お気軽にご質問ください。");
+      // 保存済み履歴(この端末)があれば復元、なければ挨拶＋よくある質問
+      sb.auth.getSession().then(function (res) {
+        var email = res.data && res.data.session && res.data.session.user && res.data.session.user.email;
+        if (email && restoreHistory(email)) return;
+        $("quick-questions").style.display = "flex";
+        addBubble("ai", "こんにちは。製品の使い方・セールスポイント・見積のご相談など、お気軽にご質問ください。");
+      });
     }
   }
+
+  // ── チャット履歴のローカル保存(v3.4・2026-09-07) ──────────
+  // 「ページを更新すると質問が消える」対策。localStorage にメールアドレス別で最大 HIST_MAX 件保存。
+  // 保存先はこの端末・このブラウザのみ(PCとスマホで共有されない)。
+  // AIへ渡す文脈(chatHistory)は直近 HIST_CONTEXT_MIN 分以内のやり取りだけ復元し、古い履歴は表示のみ。
+  var HIST_MAX = 100;
+  var HIST_CONTEXT_MIN = 30;
+  var histKey = null;
+  var WDAYS = ["日", "月", "火", "水", "木", "金", "土"];
+
+  function histLoad() {
+    try { var s = localStorage.getItem(histKey); return s ? JSON.parse(s) : []; } catch (e) { return []; }
+  }
+  function histSave(list) {
+    try { localStorage.setItem(histKey, JSON.stringify(list.slice(-HIST_MAX))); } catch (e) { /* 容量超過などは無視 */ }
+  }
+  function histAdd(q, a, product) {
+    if (!histKey) return;
+    var list = histLoad();
+    list.push({ q: q, a: a, p: product || null, t: Date.now() });
+    histSave(list);
+    $("hist-bar").style.display = "flex";
+  }
+  function histDayLabel(t) {
+    var d = new Date(t);
+    return (d.getMonth() + 1) + "/" + d.getDate() + "(" + WDAYS[d.getDay()] + ")";
+  }
+  function addDivider(text) {
+    var row = document.createElement("div");
+    row.className = "row divider";
+    var s = document.createElement("span");
+    s.textContent = text;
+    row.appendChild(s);
+    $("messages").appendChild(row);
+  }
+  // 戻り値: 復元した(true) / 履歴なし(false)
+  function restoreHistory(email) {
+    histKey = "sa_chat_hist:" + String(email).toLowerCase();
+    var list = histLoad();
+    if (!list.length) { $("hist-bar").style.display = "none"; return false; }
+    var cutoff = Date.now() - HIST_CONTEXT_MIN * 60 * 1000;
+    var lastDay = "";
+    chatHistory = [];
+    list.forEach(function (e) {
+      var day = histDayLabel(e.t);
+      if (day !== lastDay) { addDivider(day); lastDay = day; }
+      addBubble("user", e.q);
+      addBubble("ai", e.a);
+      if (e.t >= cutoff) {
+        chatHistory.push({ role: "user", content: e.q });
+        chatHistory.push({ role: "assistant", content: e.a });
+      }
+    });
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+    lastQuestion = list[list.length - 1].q;
+    lastAnswer = list[list.length - 1].a;
+    $("hist-bar").style.display = "flex";
+    $("quick-questions").style.display = "none";
+    setTimeout(function () { $("messages").scrollTop = $("messages").scrollHeight; }, 0);
+    return true;
+  }
+  $("hist-clear-btn").addEventListener("click", function () {
+    if (!confirm("この端末に保存された質問と回答の履歴を消去します。よろしいですか?")) return;
+    try { if (histKey) localStorage.removeItem(histKey); } catch (e) {}
+    chatHistory = [];
+    $("messages").innerHTML = "";
+    $("hist-bar").style.display = "none";
+    $("quick-questions").style.display = "flex";
+    addBubble("ai", "履歴を消去しました。引き続きお気軽にご質問ください。");
+  });
   function showLogin() {
     $("login-view").style.display = "block";
     $("portal-tabs").style.display = "none";
@@ -1438,7 +1532,9 @@
   $("logout-btn").addEventListener("click", function () {
     sb.auth.signOut().then(function () {
       chatHistory = [];
+      histKey = null;   // 保存済み履歴は端末に残す(次回ログイン時に復元)
       $("messages").innerHTML = "";
+      $("hist-bar").style.display = "none";
       showLogin();
     });
   });
@@ -1557,6 +1653,7 @@
             chatHistory.push({ role: "user", content: q });
             chatHistory.push({ role: "assistant", content: answer });
             if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+            histAdd(q, answer, selectedProduct);
             lastQuestion = q;
             lastAnswer = answer;
             if (flagged || looksUnanswered(answer)) offerHandoff(q, answer);
