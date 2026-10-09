@@ -575,6 +575,10 @@
     transition: background .12s, color .12s, border-color .12s;
   }
   .qq-btn:hover { background: var(--sky); border-color: var(--sky); color: #fff; }
+  /* 在庫状況(2026-10-09追加): 少し目立たせる */
+  .qq-btn.qq-hot { background: linear-gradient(120deg, var(--sky), var(--aqua)); border-color: transparent; color: #fff; font-weight: 700; box-shadow: 0 2px 8px rgba(0,120,160,0.18); }
+  .qq-btn.qq-hot::before { content: "📦 "; }
+  .qq-btn.qq-hot:hover { filter: brightness(1.06); }
 
   /* ── 製品選択チップ ─────────────────────── */
   #product-chips-wrap {
@@ -745,6 +749,7 @@
       ・<button class="handoff-link" id="handoff-open-btn" type="button">AIで解決しない場合は、質問を直接Slackへ転送できます</button>
     </div>
     <div id="quick-questions">
+      <button class="qq-btn qq-hot">製品の在庫状況を教えてください</button>
       <button class="qq-btn">騒音環境で使えるイヤホンは?</button>
       <button class="qq-btn">3年保証の内容を教えてください</button>
       <button class="qq-btn">Buddycomとの接続手順は?</button>
@@ -762,7 +767,7 @@
     </div>
     <div id="product-panel"></div>
     <div id="input-bar">
-      <input type="text" id="chat-input" placeholder="例: Buddycomと接続するときの設定手順は?">
+      <input type="text" id="chat-input" placeholder="例: MKI-P3の在庫はありますか? / Buddycomとの接続手順は?">
       <button id="send-btn">送信</button>
     </div>
   </div>
