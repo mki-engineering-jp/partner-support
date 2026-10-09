@@ -192,6 +192,24 @@
   }
   .tab-btn:not(.active):hover { background: var(--mist); }
 
+  /* ── 在庫状況の更新(管理者専用・AIチャット/お知らせタブ内) ── */
+  #inv-admin-box { display: none; background: #FFF8E6; border: 1px solid #F0D48A; border-radius: 14px; padding: 12px 16px; margin-bottom: 14px; }
+  .inv-admin-head { font-weight: 700; font-size: 0.9rem; color: #7A5A00; margin-bottom: 4px; }
+  .inv-admin-head::before { content: "📦 "; }
+  .inv-admin-desc { font-size: 0.78rem; color: #6B5A2A; line-height: 1.7; margin-bottom: 8px; }
+  #inv-current { color: #9A7B1E; }
+  .inv-drop { border: 1.5px dashed #D9B860; border-radius: 12px; padding: 14px; text-align: center; font-size: 0.82rem; color: #7A5A00; cursor: pointer; background: #fff; }
+  .inv-drop:hover, .inv-drop.over { background: #FFF1CC; border-color: #B8902A; }
+  .inv-warn { font-size: 0.76rem; color: #A05A00; background: #FFF1CC; border-radius: 8px; padding: 8px 10px; margin-top: 8px; line-height: 1.7; }
+  .inv-preview { width: 100%; height: 260px; margin-top: 8px; border: 1.5px solid var(--line); border-radius: 10px; padding: 10px; font-size: 0.76rem; line-height: 1.6; font-family: inherit; color: var(--deep); resize: vertical; box-sizing: border-box; }
+  #inv-actions { display: flex; gap: 8px; margin-top: 8px; }
+  .inv-save { background: linear-gradient(120deg, var(--sky), var(--aqua)); color: #fff; border: none; border-radius: 10px; padding: 9px 16px; font-size: 0.85rem; font-weight: 700; cursor: pointer; }
+  .inv-save:disabled { opacity: 0.6; cursor: default; }
+  .inv-cancel { background: #fff; color: #4A6E80; border: 1.5px solid var(--line); border-radius: 10px; padding: 9px 14px; font-size: 0.85rem; cursor: pointer; }
+  .inv-msg { font-size: 0.78rem; margin-top: 6px; min-height: 1em; color: #4A6E80; }
+  .inv-msg.ok { color: #1E7A4A; }
+  .inv-msg.err { color: #A03A2F; }
+
   /* ── お知らせ(管理者からのお知らせ) ─────────── */
   #notices-box {
     display: none;
@@ -713,6 +731,8 @@
   <!-- チャット -->
   <div id="chat-view">
     <!-- 管理者からのお知らせ(AIチャット/お知らせタブ内のみ表示) -->
+    <!-- 在庫状況の更新(管理者のみ表示・2026-10-09) -->
+    <div id="inv-admin-box" aria-label="在庫状況の更新"></div>
     <div id="notices-box" aria-label="管理者からのお知らせ">
       <div class="notices-head">お知らせ</div>
       <div id="notices-list"></div>
@@ -1266,6 +1286,7 @@
     renderProducts();
     renderProductChips();
     if (!noticesLoaded) loadNotices();
+    initInventoryAdmin();
     if ($("messages").childElementCount === 0) {
       // 保存済み履歴(この端末)があれば復元、なければ挨拶＋よくある質問
       sb.auth.getSession().then(function (res) {
@@ -1384,6 +1405,29 @@
     talksLoaded = false;
     noticesLoaded = false;
     $("notices-box").style.display = "none";
+    $("inv-admin-box").style.display = "none";
+    invAdminInit = false;
+  }
+
+  // ── 在庫状況の更新(管理者のみ・2026-10-09) ──────
+  // portal_admins に自分のメールがある場合だけ、xlsxをドロップしてAI秘書の在庫知識(bot_knowledge id107)を更新できる箱を出す。
+  // 解析ロジックは inventory-admin.js(ExcelJS)に分離。管理者以外には読み込まない。
+  var invAdminInit = false;
+  function initInventoryAdmin() {
+    if (invAdminInit) return;
+    invAdminInit = true;
+    sb.from("portal_admins").select("email").limit(1).then(function (res) {
+      if (res.error || !res.data || !res.data.length) return;
+      var sc = document.createElement("script");
+      sc.src = "inventory-admin.js?v=20261009";
+      sc.onload = function () {
+        if (window.InventoryAdmin) {
+          window.InventoryAdmin.mount(sb, $("inv-admin-box"));
+          $("inv-admin-box").style.display = "block";
+        }
+      };
+      document.head.appendChild(sc);
+    });
   }
 
   // ── 管理者からのお知らせ ─────────────────────
