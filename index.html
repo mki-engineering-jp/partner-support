@@ -1416,7 +1416,7 @@
 
   // ── 在庫状況の更新(管理者のみ・2026-10-09) ──────
   // portal_admins に自分のメールがある場合だけ、xlsxをドロップしてAI秘書の在庫知識(bot_knowledge id107)を更新できる箱を出す。
-  // 解析ロジックは inventory-admin.js(ExcelJS)に分離。管理者以外には読み込まない。
+  // 在庫状況は社内在庫システム(inv_stock)からSupabase側で自動生成(2026-10-26〜)。管理UIは inventory-admin.js。管理者以外には読み込まない。
   var invAdminInit = false;
   function initInventoryAdmin() {
     if (invAdminInit) return;
@@ -1424,7 +1424,7 @@
     sb.from("portal_admins").select("email").limit(1).then(function (res) {
       if (res.error || !res.data || !res.data.length) return;
       var sc = document.createElement("script");
-      sc.src = "inventory-admin.js?v=20261009";
+      sc.src = "inventory-admin.js?v=20261026";
       sc.onload = function () {
         if (window.InventoryAdmin) {
           window.InventoryAdmin.mount(sb, $("inv-admin-box"));
