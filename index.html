@@ -239,6 +239,11 @@
   .notices-head::before { content: "📢"; }
   .notice-item { padding: 8px 0; border-top: 1px dashed var(--line); }
   .notice-item:first-of-type { border-top: none; }
+  .notice-item.notice-older { display: none; }
+  #notices-box.show-older .notice-item.notice-older { display: block; }
+  .notice-more { display: block; margin-top: 8px; font-size: 0.8rem; color: #4A6E80; background: none; border: none; font-family: inherit; cursor: pointer; padding: 0; }
+  .notice-more:hover { color: var(--aqua); }
+  #notices-box.show-older .notice-more .more-open, #notices-box:not(.show-older) .notice-more .more-close { display: none; }
   .notice-head-row { cursor: pointer; display: flex; align-items: baseline; gap: 8px; }
   .notice-head-row:hover .notice-title { color: var(--aqua); }
   .notice-arrow { font-size: 0.7rem; color: #4A6E80; transition: transform 0.15s; flex: 0 0 auto; }
@@ -1471,7 +1476,7 @@
       list.innerHTML = "";
       res.data.forEach(function (n, idx) {
         var item = document.createElement("div");
-        item.className = "notice-item" + (idx === 0 ? " open" : "");
+        item.className = "notice-item" + (idx === 0 ? " open" : "") + (idx >= 2 ? " notice-older" : "");   // 3件目以降は折りたたみ
 
         var head = document.createElement("div");
         head.className = "notice-head-row";
@@ -1516,6 +1521,14 @@
         item.appendChild(content);
         list.appendChild(item);
       });
+      if (res.data.length > 2) {
+        var more = document.createElement("button");
+        more.type = "button";
+        more.className = "notice-more";
+        more.innerHTML = '<span class="more-open">過去のお知らせ（' + (res.data.length - 2) + '件）はこちら ▼</span><span class="more-close">過去のお知らせを閉じる ▲</span>';
+        more.addEventListener("click", function () { $("notices-box").classList.toggle("show-older"); });
+        list.appendChild(more);
+      }
       $("notices-box").style.display = "block";
     });
   }
