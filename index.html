@@ -169,6 +169,17 @@
   }
   #send-btn:disabled { opacity: 0.55; cursor: default; }
 
+  /* AI回答の操作ボタン・音声入力 */
+  .row.ai { flex-wrap: wrap; }
+  .ans-actions { flex-basis: 100%; display: flex; gap: 6px; margin: 6px 0 2px; }
+  .ans-btn { border: 1.5px solid var(--line); background: var(--white); color: #4A6E80; border-radius: 999px; font-family: inherit; font-size: 0.78rem; padding: 4px 12px; cursor: pointer; transition: all 0.15s; }
+  .ans-btn:hover:not(:disabled) { border-color: var(--sky); color: var(--sky); }
+  .ans-btn.share { background: linear-gradient(120deg, var(--sky), var(--aqua)); border-color: transparent; color: #fff; }
+  #mic-btn { border: 1.5px solid var(--line); background: var(--white); border-radius: 999px; padding: 0 14px; font-size: 1.1rem; cursor: pointer; line-height: 1; }
+  #mic-btn:hover { border-color: var(--sky); }
+  #mic-btn.listening { background: var(--sky); border-color: var(--sky); animation: micPulse 1s infinite; }
+  @keyframes micPulse { 0%,100% { box-shadow: 0 0 0 0 rgba(46,159,216,0.6); } 50% { box-shadow: 0 0 0 8px rgba(46,159,216,0); } }
+
   /* ── タブナビゲーション ──────────────────── */
   #portal-tabs {
     display: none;
@@ -768,6 +779,7 @@
     <div id="product-panel"></div>
     <div id="input-bar">
       <input type="text" id="chat-input" placeholder="例: MKI-P3の在庫はありますか? / Buddycomとの接続手順は?">
+      <button id="mic-btn" type="button" title="音声入力" aria-label="音声入力">🎤</button>
       <button id="send-btn">送信</button>
     </div>
   </div>
@@ -2310,11 +2322,117 @@
     b.className = "bubble" + (extraClass ? " " + extraClass : "");
     b.textContent = text;
     row.appendChild(b);
+    if (who === "ai" && !extraClass) { if (parent) parent.appendChild(row); else $("messages").appendChild(row); mkiAddAnswerActions(row); }
     if (parent) { parent.appendChild(row); return row; }   // 折りたたみ履歴など、別の入れ物に追加
     $("messages").appendChild(row);
     row.scrollIntoView({ block: "end" });
     return row;
   }
+  var MKI_TOOL_NAME = 'パートナー様専用 営業サポートポータル（幹開発）';
+
+  // ===== AI回答の コピー／共有／メール と 音声入力 =====
+  function mkiAnswerPlain(bubble) {
+    // 図タグ [[図:...]] や figure を除いたテキストを取り出す
+    var clone = bubble.cloneNode(true);
+    var figs = clone.querySelectorAll('figure');
+    for (var i = 0; i < figs.length; i++) figs[i].parentNode.replaceChild(document.createTextNode('\n'), figs[i]);
+    return (clone.textContent || '').replace(/\[\[図:[^\]]*\]\]/g, '').trim();
+  }
+  function mkiBuildShareText(row) {
+    var ans = mkiAnswerPlain(row.querySelector('.bubble'));
+    var q = '';
+    var prev = row.previousElementSibling;
+    while (prev) {
+      if (prev.classList.contains('user')) { q = (prev.querySelector('.bubble') || prev).textContent.trim(); break; }
+      if (prev.classList.contains('divider')) break;
+      prev = prev.previousElementSibling;
+    }
+    var t = '';
+    if (q) t += '【質問】\n' + q + '\n\n【回答】\n';
+    t += ans;
+    t += '\n\n―― ' + MKI_TOOL_NAME + '（AIによる回答は参考情報です。正式な仕様・条件は幹開発株式会社にご確認ください）';
+    return { q: q, a: ans, text: t };
+  }
+  function mkiCopyText(text) {
+    if (navigator.clipboard && navigator.clipboard.writeText) return navigator.clipboard.writeText(text);
+    return new Promise(function(res, rej) {
+      var ta = document.createElement('textarea');
+      ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'fixed'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); res(); } catch (e) { rej(e); }
+      document.body.removeChild(ta);
+    });
+  }
+  function mkiFlash(btn, label) {
+    var orig = btn.innerHTML; btn.innerHTML = label; btn.disabled = true;
+    setTimeout(function() { btn.innerHTML = orig; btn.disabled = false; }, 1600);
+  }
+  function mkiAddAnswerActions(row) {
+    // 直前にユーザーの質問がある回答だけに付ける（あいさつ等は対象外）
+    var s = mkiBuildShareText(row);
+    if (!s.q || !s.a) return;
+    var bar = document.createElement('div');
+    bar.className = 'ans-actions';
+    var mk = function(cls, html, title) { var b = document.createElement('button'); b.type = 'button'; b.className = 'ans-btn ' + cls; b.innerHTML = html; b.title = title; return b; };
+    var copyBtn = mk('copy', '📋 コピー', '質問と回答をコピー');
+    var shareBtn = mk('share', '↗ 共有', '質問と回答を共有');
+    var mailBtn = mk('mail', '✉ メール', 'メールで送る');
+    copyBtn.addEventListener('click', function() {
+      mkiCopyText(mkiBuildShareText(row).text).then(function() { mkiFlash(copyBtn, '✔ コピーしました'); }, function() { mkiFlash(copyBtn, '✖ 失敗'); });
+    });
+    shareBtn.addEventListener('click', function() {
+      var d = mkiBuildShareText(row);
+      if (navigator.share) {
+        navigator.share({ title: MKI_TOOL_NAME + ' の回答', text: d.text }).catch(function() {});
+      } else {
+        mkiCopyText(d.text).then(function() { mkiFlash(shareBtn, '✔ コピーしました'); }, function() { mkiFlash(shareBtn, '✖ 失敗'); });
+      }
+    });
+    mailBtn.addEventListener('click', function() {
+      var d = mkiBuildShareText(row);
+      var subj = '【' + MKI_TOOL_NAME + '】' + d.q.slice(0, 40);
+      var href = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(d.text);
+      if (href.length > 1800) {   // 長文はメーラーに渡せないことがあるのでコピーに切替
+        mkiCopyText(d.text).then(function() { mkiFlash(mailBtn, '✔ 長文のためコピーしました'); });
+        return;
+      }
+      window.location.href = href;
+    });
+    bar.appendChild(copyBtn); bar.appendChild(shareBtn); bar.appendChild(mailBtn);
+    row.appendChild(bar);
+  }
+  // 音声入力（Web Speech API・対応ブラウザのみ表示）
+  (function() {
+    var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    var micBtn = document.getElementById('mic-btn');
+    if (!micBtn) return;
+    if (!SR) { micBtn.style.display = 'none'; return; }
+    var input = document.getElementById('chat-input');
+    var rec = null, listening = false, base = '';
+    function stop() { if (rec) { try { rec.stop(); } catch (e) {} } }
+    micBtn.addEventListener('click', function() {
+      if (listening) { stop(); return; }
+      rec = new SR();
+      rec.lang = 'ja-JP'; rec.interimResults = true; rec.continuous = false; rec.maxAlternatives = 1;
+      base = input.value ? input.value.replace(/\s+$/, '') : '';
+      rec.onstart = function() { listening = true; micBtn.classList.add('listening'); micBtn.title = '停止（タップで終了）'; input.placeholder = '話しかけてください…'; };
+      rec.onresult = function(ev) {
+        var fin = '', interim = '';
+        for (var i = ev.resultIndex; i < ev.results.length; i++) {
+          if (ev.results[i].isFinal) fin += ev.results[i][0].transcript; else interim += ev.results[i][0].transcript;
+        }
+        if (fin) base = (base ? base + ' ' : '') + fin.trim();
+        input.value = base + (interim ? (base ? ' ' : '') + interim : '');
+        if (input.tagName === 'TEXTAREA') { input.style.height = 'auto'; input.style.height = input.scrollHeight + 'px'; }
+      };
+      rec.onerror = function(ev) {
+        if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed') alert('マイクの使用が許可されていません。ブラウザの設定でマイクを許可してください。');
+      };
+      rec.onend = function() { listening = false; micBtn.classList.remove('listening'); micBtn.title = '音声入力'; input.placeholder = micBtn.getAttribute('data-ph'); input.focus(); };
+      try { rec.start(); } catch (e) {}
+    });
+    micBtn.setAttribute('data-ph', input.placeholder);
+  })();
   function showLoginMsg(text, type) {
     var el = $("login-msg");
     el.textContent = text;
